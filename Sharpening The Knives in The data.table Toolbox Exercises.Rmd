@@ -1,0 +1,162 @@
+---
+title: 'Sharpening The Knives in The data.table Toolbox: Exercises'
+author: "sindri"
+date: "8 June 2018"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](https://www.r-exercises.com/wp-content/uploads/2018/06/tools_med.jpg)
+
+If knowledge is power, then knowledge of data.table is something of a super power, at least in the realm of data manipulation in R.  
+
+In this exercise set, we will use some of the more obscure functions from the data.table package. The solutions will use set(), inrange(), chmatch(), uniqueN(), tstrsplit(), rowid(), shift(), copy(), address(), setnames() and last(). You are free to use more, as long as they are part of data.table. The objective is to get (more) familiar with these functions and be able to call on them in real-life, giving us fewer reasons to leave the fast and neat data.table universe.  
+
+Solutions are available [here](http://r-exercises.com/2018/06/08/sharpening-the-knives-in-the-data-table-toolbox-solutions/).  
+
+PS. If you are unfamiliar with data.table, we recommend you start with the exercises covering the basics of [data.table](https://www.r-exercises.com/2017/08/23/basics-of-data-table-smooth-data-exploration/).  
+
+## Exercise 1
+
+Load the gapminder data-set from the gapminder package. Save it to an object called “gp” and convert it to a data.table. How many different countries are covered by the data?
+
+```{r exercise-1, message=FALSE}
+library(gapminder)
+library(data.table)
+
+gp <- gapminder
+setDT(gp)
+
+gp
+gp[, uniqueN(country)]
+```
+
+## Exercise 2
+
+Create a lag term for GDP per capita. That is the value of GDP at the last observation (which are 5 years apart) for each country.
+
+```{r exercise-2}
+gp[, gdpPercap_lag := shift(gdpPercap), by = country]
+gp
+```
+
+## Exercise 3
+
+Using the data.table syntax, calculate the GDP per capita growth from 2002 to 2007 for each country. Extract the one with the highest value for each continent.
+
+```{r exercise-3}
+gp[year == 2007, .(country, continent, growth = (gdpPercap / gdpPercap_lag) - 1)][order(growth), .(country = last(country), growth = last(growth)), continent]
+```
+
+## Exercise 4
+
+Save the column names in a vector named “temp” and change the name of the year column in “gp” to “anno” (just because); print the temp. Oh my, what just happened? Check the memory address of temp and names(gp), respectively. 
+ 
+```{r exercise-4}
+temp <- names(gp)
+setnames(gp, "year", "anno")
+temp
+address(temp)
+address(names(gp))
+```
+
+## Exercise 5
+
+Overwrite “gp” with the original data again. Now make a copy passed by value into temp (before you change the year to anno) so you can keep the original variable names. Check the addresses again. Also, change factors to characters and don’t forget to convert to data.table again.
+ 
+```{r exercise-5}
+gp <- gapminder
+setDT(gp)
+temp <- copy(names(gp))
+setnames(gp, "year", "anno")
+temp
+names(gp)
+address(temp)
+address(names(gp))
+str(gp)
+factcols <- sapply(gp, is.factor)
+factcols <- names(factcols)[factcols]
+str(gp[, (factcols) := lapply(.SD, as.character), .SDcols = factcols])
+```
+
+## Exercise 6
+
+A data.table of the number of goals each team in group A made in the FIFA world championship is given below. Import this into R and add a column with the countries’ population in 2017 to the data.table, rounded to the nearest million.  
+
+
+gA_2014 <- data.table(  
+  country   = c("Brazil", "Mexico", "Croatia", "Cameroon"),    
+  goals2014 = c(7, 4, 6, 1)  
+)  
+gA_2014  
+   country goals2014  
+1:   Brazil         7  
+2:   Mexico         4  
+3:  Croatia         6  
+4: Cameroon         1  
+ 
+```{r exercise-6, message=FALSE}
+gA_2014 <- data.table(  
+  country   = c("Brazil", "Mexico", "Croatia", "Cameroon"),    
+  goals2014 = c(7, 4, 6, 1)  
+) 
+gA_2014
+
+ex6 <- merge(gA_2014, gp[anno == "2007"], by = "country")[, .(country, goals2014, pop_mill = round(pop / 1e6))]
+ex6
+```
+
+## Exercise 7
+
+Calculate the number of years since the country reached $8k in GDP per capita at each relevant observation as accurately as the data allows.
+
+```{r exercise-7}
+gp <- gp[order(country, anno)]
+gp[, years_from8k := anno - anno[which(gdpPercap >= 8e3)[1]], by = country
+   ][years_from8k < 0, years_from8k := NA]
+gp
+```
+
+## Exercise 8
+
+Add a subtly different variable using rowid(). That is the number of the observations among observations where the GDP is below 8k up to and including the given observation. Which country, in each continent, has the most observations above 8k? If there are ties, then list all of the those tied at the top.              
+ 
+```{r exercise-8}
+gp[gdpPercap >= 8e3, obs8k_numb := rowid(country)]
+gp[anno == 2007 & !is.na(obs8k_numb)
+   ][order(obs8k_numb),
+     .(country[obs8k_numb == max(obs8k_numb)], obs8k_numb[obs8k_numb == max(obs8k_numb)]),
+     continent
+     ]
+```
+
+
+## Exercise 9
+
+Use inrange() to extract countries that have their life expectancy either below 40 or above 80 in 2002.
+
+```{r exercise-9}
+gp[anno == 2002 & !inrange(lifeExp, 40, 80)]
+```
+
+## Exercise 10
+
+Now, the soccer/football data from exercise 6 came with goals made and goals made against each team as the following:  
+  
+gA_2014b <- data.table(  
+  country   = c("Brazil", "Mexico", "Croatia", "Cameroon"),    
+  goals2014 = c("7-2", "4-1", "6-6", "1-9")  
+)  
+How can you split the goals column into two relevant columns?  
+
+```{r exercise-10}
+gA_2014b <- data.table(  
+  country   = c("Brazil", "Mexico", "Croatia", "Cameroon"),    
+  goals2014 = c("7-2", "4-1", "6-6", "1-9")  
+)  
+gA_2014b[, c("t1", "t2") := tstrsplit(goals2014, "-")]
+gA_2014b
+```
