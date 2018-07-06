@@ -1,0 +1,105 @@
+---
+title: 'Basics of data.table: Smooth data exploration'
+author: "sindri"
+date: "23 August 2017"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](https://www.r-exercises.com/wp-content/uploads/2017/08/speed.jpg)
+
+The data.table package provides perhaps the fastest way for data wrangling in R. The syntax is concise and is made to resemble SQL. After studying the basics of data.table and finishing this exercise set successfully you will be able to start easing into using data.table for all your data manipulation needs.  
+
+We will use data drawn from the 1980 US Census on married women aged 21–35 with two or more children. The data includes gender of first and second child, as well as information on whether the woman had more than two children, race, age and number of weeks worked in 1979. For more information please refer to the [reference manual for the package AER](https://cran.r-project.org/web/packages/AER/AER.pdf).  
+
+Answers are available [here](http://www.r-exercises.com/2017/08/23/basics-of-data-table-smooth-data-exploration-solution).  
+
+## Exercise 1
+
+Load the data.table package. Furtermore (install and) load the AER package and run the command data("Fertility") which loads the dataset Fertility to your workspace. Turn it into a data.table object.
+
+```{r exercise-1, message=FALSE}
+library(data.table)
+library(AER)
+
+data("Fertility")
+setDT(Fertility)
+
+Fertility
+```
+
+## Exercise 2
+
+Select rows 35 to 50 and print to console its age and work entry.  
+
+```{r exercise-2}
+Fertility[35:50, .(age, work)]
+```
+
+## Exercise 3
+
+Select the last row in the dataset and print to console.  
+
+```{r exercise-3}
+Fertility[.N]
+```
+
+## Exercise 4
+
+Count how many women proceeded to have a third child.  
+ 
+```{r exercise-4}
+Fertility[morekids == "yes", .N]
+```
+
+## Exercise 5
+
+There are four possible gender combinations for the first two children. Which is the most common? Use the by argument.  
+ 
+```{r exercise-5}
+Fertility[, .N, by = .(gender1, gender2)]
+```
+
+## Exercise 6
+
+By racial composition what is the proportion of woman working four weeks or less in 1979?  
+ 
+```{r exercise-6}
+Fertility[, mean(work <= 4), by = .(afam, hispanic, other)]
+```
+
+## Exercise 7
+
+Use %between% to get a subset of woman between the age of 22 and 24 and calculate the proportion who had a boy as their firstborn.  
+
+```{r exercise-7}
+Fertility[age %between% c(22, 24), mean(gender1 == "male")]
+```
+
+## Exercise 8
+
+Add a new column, age squared, to the dataset.  
+
+```{r exercise-8}
+Fertility[, age_squared := age^2]
+```
+
+
+## Exercise 9
+
+Out of all the racial composition in the dataset which had the lowest proportion of boys for their firstborn. With the same command display the number of observation in each category as well.  
+
+```{r exercise-9}
+Fertility[, .(.N, mean(gender1 == "male")), by = .(afam, hispanic, other)]
+```
+
+## Exercise 10
+
+Calculate the proportion of women who have a third child by gender combination of the first two children?  
+
+```{r exercise-10}
+Fertility[, mean(morekids == "yes"), by = .(gender1, gender2)]
+```
