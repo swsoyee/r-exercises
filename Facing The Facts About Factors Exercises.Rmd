@@ -1,0 +1,149 @@
+---
+title: 'Facing The Facts About Factors: Exercises'
+author: "sindri"
+date: "6 July 2018"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Factor variables in R can be mind-boggling. Often, you can just avoid them and use characters vectors instead – just don’t forget to set stringsAsFactors=FALSE. They are, however, very useful in [some circumstances](https://stackoverflow.com/questions/3445316/factors-in-r-more-than-an-annoyance), such as statistical modelling and presenting data in graphs and tables. Relying on factors but misunderstanding them has been known to “eat up hours of valuable time in any given analysis”, as one member of the community [put it](https://www.stat.ubc.ca/~jenny/STAT545A/block08_bossYourFactors.html#factors-are-high-maintenance-variables). It is therefore a good investment to get them straight as soon as possible on your R journey.  
+
+The intent behind these exercises is to help you find and fill in the cracks and holes in your relationship with factor variables.  
+
+Solutions are available [here](https://www.r-exercises.com/2018/07/06/11753).  
+
+## Exercise 1
+
+Load the `gapminder` data-set from the `gapminder` package. Save it to an object called `gp`. Check programmatically how many factors it contains and how many levels each factor has.  
+
+```{r exercise-1, message=FALSE}
+library(gapminder)
+gp <- gapminder
+faccol <- sapply(gp, is.factor)
+faccol
+levelCount <- sapply(gp[faccol], levels)
+levelCount
+lapply(levelCount, length)
+```
+
+`r sum(faccol)` factors are contained in this dataset.  
+And the number of levels are:  
+`r lapply(levelCount, length)`
+
+## Exercise 2
+
+Notice that one continent, Antarctica, is missing from the corresponding factor – add it as the last level of six.  
+
+```{r exercise-2}
+levels(gp$continent)
+levels(gp$continent) <- c(levels(gp$continent), "Antartica")
+levels(gp$continent)
+```
+
+## Exercise 3
+
+Actually, you change your mind. There is no permanent human population on Antarctica. Drop this (unused) level from your factor. Can you find three ways to do this, then you are an expert.  
+
+```{r exercise-3}
+# Method 1
+gp$continent <- droplevels(gp$continent)
+levels(gp$continent)
+# Method 2
+gp$continent <- factor(gp$continent)
+levels(gp$continent)
+# Method 3
+gp$continent  <- gp$continent[, drop = TRUE]
+levels(gp$continent)
+```
+
+## Exercise 4
+
+Again, modify the continent factor, making it more precise. Add two new levels instead of Americas, North-America and South-America. The countries in the following vector should be classified as South-America and the rest as North-America.  
+
+`c("Argentina", "Bolivia", "Brazil", "Chile", "Colombia", "Ecuador", "Paraguay", "Peru", "Uruguay", "Venezuela")`  
+ 
+```{r exercise-4}
+# Add new levels, else if will generate <NA>
+levels(gp$continent) <- c(levels(gp$continent), "North-America", "South-America")
+sAmerica <- c("Argentina", "Bolivia", "Brazil", "Chile", "Colombia", "Ecuador",
+"Paraguay", "Peru", "Uruguay", "Venezuela")
+
+gp[gp$country %in% sAmerica, ]$continent <- as.factor("South-America")
+gp[gp$continent == "Americas", ]$continent <- "North-America"
+gp$continent <- droplevels(gp$continent)
+table(gp$continent)
+```
+
+## Exercise 5
+
+Get the levels of the factor in alphabetical order.   
+ 
+```{r exercise-5}
+sort(levels(gp$continent))
+gp$continent <- factor(gp$continent, levels = sort(levels(gp$continent)))
+levels(gp$continent)
+```
+
+## Exercise 6
+
+Re-order the continent levels again so that they appear in order of total population in 2007.  
+ 
+```{r exercise-6, message=FALSE, warning=FALSE}
+library(data.table)
+setDT(gp)
+gp$continent <- factor(gp$continent, 
+                       levels = (gp[year == 2007, 
+                                    sum(pop), 
+                                    by = continent][order(-V1)]$continent
+                                 )
+                       )
+levels(gp$continent)
+```
+
+## Exercise 7
+
+Reverse the order of the factor and define continents as an ordered factor.  
+
+```{r exercise-7}
+gp$continent <- factor(gp$continent,
+                       levels = rev(levels(gp$continent)),
+                       ordered = TRUE
+                       )
+levels(gp$continent)
+```
+
+## Exercise 8
+
+Make the continent an unordered factor again and set North-America as the first level, thus interpreted as a reference group in modelling functions such as lm().  
+
+```{r exercise-8}
+class(gp$continent)
+class(gp$continent) <- "factor"
+class(gp$continent)
+gp$continent <- relevel(gp$continent, ref = "North-America")
+levels(gp$continent)
+```
+
+
+## Exercise 9
+
+Turn the following messy vector into a factor with two levels: Female and Male, using the factor function. Use the labels argument in the factor() function (ps: you can save some time by applying tolower() and trimws() before you apply factor()).  
+`gender <- c("f", "m ", "male ","male", "female", "FEMALE", "Male", "f", "m")`  
+
+```{r exercise-9}
+gender <- c("f", "m ", "male ","male", "female", "FEMALE", "Male", "f", "m")
+g <- tolower(substr(gender, 1, 1))
+g <- as.factor(ifelse(g == "f", "Female", "Male"))
+g
+```
+
+## Exercise 10
+
+Use the fact that factors are built on top of integers and create a dummy (binary) variable male that takes the value 1 if the gender has the value “Male.”  
+
+```{r exercise-10}
+as.factor(ifelse(g == "Male", 1, 0))
+```
