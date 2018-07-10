@@ -1,0 +1,123 @@
+---
+title: 'Data Manipulation with Data Table - Part 1'
+author: "Biswarup Ghosh"
+date: "15 June 2017 "
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](https://www.r-exercises.com/wp-content/uploads/2016/11/Occasional-Table-Group.jpg)
+
+In the exercises below we cover the some useful features of data.table ,data.table is a library in R for fast manipulation of large data frame .Please see the data.table vignette before trying the solution .This first set is intended for the begineers of data.table package and does not cover set keywords, joins of data.table which will be covered in the next set . Load the data.table library in your r session before starting the exercise  
+Answers to the exercises are available [here](http://www.r-exercises.com/2017/06/15/data-manipulation-with-data-table-part-1-solutions/).  
+
+If you obtained a different (correct) answer than those listed on the solutions page, please feel free to post your answer as a comment on that page.  
+
+## Exercise 1
+
+Load the `iris` dataset ,make it a `data.table` and name it `iris_dt`, Print mean of `Petal.Length`, grouping by first letter of `Species` from `iris_dt`.
+
+```{r exercise-1, message=FALSE}
+library(data.table)
+
+iris_dt <- data.table(iris)
+iris_dt[, mean(Petal.Length), by = substr(Species, 1, 1)]
+```
+
+## Exercise 2
+
+Load the `diamonds` dataset from `ggplot2` package as `dt` (a `data.table`), Find mean `price` for each group of `cut` and `color`.  
+
+```{r exercise-2, message=FALSE}
+library(ggplot2)
+dt <- data.table(diamonds)
+dt[, mean(price), by = .(cut, color)]
+```
+
+## Exercise 3
+
+Load the `diamonds` dataset from `ggplot2` package as `dt`. Now group the dataset by `price` per `carat` and print top 5 in terms of count per group. Don't use head, use chaining in `data.table` to achieve this.  
+
+```{r exercise-3}
+dt[, .N, by = .(price/carat)][order(-N)][1:5]
+```
+
+## Exercise 4
+
+Use the already loaded `diamonds` dataset and print the last two `carat` value of each `cut`.  
+ 
+```{r exercise-4}
+dt[, .(tail(carat,2)), by = .(cut)]
+```
+
+## Exercise 5
+
+In the same data set, find median of the columns `x`, `y`, `z` per `cut`. Use `data.table`'s methods to achieve this.  
+ 
+```{r exercise-5}
+# Method 1
+dt[, .(median(x), median(y), median(z)), by = cut]
+# Method 2
+dt[, lapply(.SD, median), by = cut, .SDcols = c("x","y","z")]
+```
+
+## Exercise 6
+
+Load the `airquality` dataset as `data.table`, Now I want to find Logarithm of wind rate for each month and for days greater than 15  
+ 
+```{r exercise-6}
+air <- airquality
+setDT(air)
+air[Day > 15, log10(Wind), by = Month]
+```
+
+## Exercise 7
+
+In the same data set, for all the odd rows, update `Temp` column by adding `10`.  
+
+```{r exercise-7}
+air[rep(c(TRUE,FALSE), length = .N),Temp := Temp + 10L]
+air
+```
+
+## Exercise 8
+
+`data.table` comes with a powerful feature of updating column by reference as you have seen in the last exercise, Its even possible to update / create multiple columns. Now to test that in the `airquality` `data.table` that you have created previously, add `10` to `Solar.R`, `Wind`.  
+
+```{r exercise-8}
+air[, `:=`(Solar.R = Solar.R + 10L, Wind = Wind + 10L)]
+air
+```
+
+
+## Exercise 9
+
+Now you have a fairly good idea of how easy its to create multiple column, Its even possible to use delete multiple column using the same idea. In this exercise, use the same `airquality` `data.table` that you have created previously from `airquality` and delete `Solar.R`, `Wind`, `Temp` using a single expression  
+
+```{r exercise-9}
+# Method 1
+air[, `:=` (Solar.R = NULL, Wind = NULL, Temp = NULL)]
+air
+# Method 2
+# air[, c("Solar.R","Wind","Temp") := NULL]
+```
+
+## Exercise 10
+
+Load the `airquality` dataset as `data.table` again, I want to create two columns `a`, `b` which indicates temp in Celcius and Kelvin scale. Write a expression to achieve same.  
+
+> Celcius = (Temp-32)*5/9  
+> Kelvin = Celcius+273.15  
+
+```{r exercise-10}
+air <- airquality
+setDT(air)
+# Method 1
+air[, `:=` (a = (Temp - 32) * 5 / 9, b = (Temp - 32) * 5 / 9 + 273.15)]
+air
+# Method 2
+# air[, c("a","b"):= list(celcius <- (Temp-32)*5/9, kelvin <- celcius+273.15)]
+```
