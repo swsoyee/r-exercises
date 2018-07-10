@@ -1,0 +1,105 @@
+---
+title: 'Data table exercises: keys and subsetting'
+author: "Han de Vries"
+date: "21 March 2016"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](https://www.r-exercises.com/wp-content/uploads/2016/03/Fotolia_20180554_XS.jpg)
+
+The data.table package is a popular R package that facilitates fast selections, aggregations and joins on large data sets. It is well-documented through several vignettes, and even has its own interactive course, offered by Datacamp. For those who want to build some mileage practising the use of data.table, there’s good news! In the coming weeks, we’ll dive into the package with several exercise sets. We’ll start with the first set today, focusing on creating data.tables, defining keys and subsetting. Before proceeding, make sure you have installed the data.table package from CRAN and studied the vignettes.  
+
+Answers to the exercises are available [here](http://www.r-exercises.com/2016/03/21/data-table-exercises-keys-and-subsetting-solutions/). For the other (upcoming) exercise sets on data.table, check back next week [here](http://www.r-exercises.com/tag/data-table/). If there are any particular topics/problems related to data.table, you’d like to see included in subsequent exercise sets, please post as a comment below.  
+
+## Exercise 1
+
+Setup: Read the wine quality dataset from the uci repository as a data.table (available for download from: http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv) into an object named df. To demonstrate the speed of data.table, we’re going to make this dataset much bigger, with:  
+```
+df <- df[rep(1:nrow(df), 1000), ]
+```
+Check that the resulting data.table has 1.2 mln. rows and 12 variables.  
+
+```{r exercise-1, message=FALSE}
+library(data.table)
+
+df <- fread("http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv")
+df <- df[rep(1:nrow(df), 1000), ]
+dim(df)
+df
+```
+
+## Exercise 2
+
+Check if `df` contains any keys. If no keys are present, create a key for the `quality` variable. Confirm that the key has been set.  
+
+```{r exercise-2, message=FALSE}
+haskey(df)
+setkey(df, quality)
+key(df)
+```
+
+## Exercise 3
+
+Create a new data.table `df2`, containing the subset of `df` with `quality` equal to `9`. Use `system.time()` to measure run-time.  
+
+```{r exercise-3}
+# Method 1
+system.time(df2 <- subset(df, quality == 9))
+# Method 2
+system.time(df2 <- df[.(9)])
+```
+
+## Exercise 4
+
+Remove the `key` from `df`, and repeat exercise 3. How much slower is this? Now, repeat exercise 3 once more and check timing. Explain the difference in speed. 
+
+> hint: use the key2() function.  
+> key2() will be deprecated in the next relase. Please use indices() instead.
+ 
+```{r exercise-4, message=FALSE}
+setkey(df, NULL)
+key(df)
+indices(df) 
+system.time(df2 <- df[quality == 9, ])
+```
+
+## Exercise 5
+
+Create a new data.table `df2`, containing the subset of df with `quality` equal to `7`, `8` or `9`. First without setting keys, then with setting keys and compare run-time.   
+ 
+```{r exercise-5}
+system.time(df2 <- df[quality %in% 7:9, ])
+setkey(df, quality)
+system.time(df2 <- df[.(7:9)])
+```
+
+## Exercise 6
+
+Create a new data.table `df3` containing the subset of observations from `df` with:
+`fixed acidity` < 8 and `residual sugar` < 5 and `pH` < 3. First without setting keys, then with setting keys and compare run-time. Explain why differences are small.  
+ 
+```{r exercise-6}
+system.time(df3 <- df[.(`fixed acidity` < 8, `residual sugar` < 5, pH < 3)])
+setkeyv(df, c('fixed acidity', 'residual sugar', 'pH'))
+system.time(df3 <- df[.(`fixed acidity` < 8, `residual sugar` < 5, pH < 3)])
+```
+
+## Exercise 7
+
+Take a bootstrap sample (i.e., with replacement) of the full df data.table without keys, and record run-time. Then, convert to a regular data frame, and repeat. What is the difference in speed? Is there any (speed) benefit in creating a new variable `id` equal to the row number, creating a key for this variable, and use this key to select the bootstrap?  
+
+```{r exercise-7}
+setkey(df, NULL)
+system.time(df3 <- df[sample(.N, .N, replace=TRUE)])
+
+df <- as.data.frame(df)
+system.time(df3 <- df[sample(nrow(df), nrow(df), replace=TRUE), ])   
+
+df$id <- 1:nrow(df)
+df <- data.table(df, key='id')
+system.time(df3 <- df[.(sample(.N, .N, replace=TRUE))]) 
+```
