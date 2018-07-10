@@ -1,0 +1,148 @@
+---
+title: 'Data Manipulation with Data Table - Part 2'
+author: "Biswarup Ghosh"
+date: "29 June 2017"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](https://www.r-exercises.com/wp-content/uploads/2016/11/Occasional-Table-Group.jpg)
+
+In the last set of [exercise](http://www.r-exercises.com/2017/06/15/data-manipulation-with-data-table-part-1/) of data.table, we saw some interesting features of data.table. In this set we will cover some of the advanced features like set operation, join in data.table. You should ideally complete the first part before attempting this one.  
+Answers to the exercises are available [here](http://www.r-exercises.com/2017/06/29/data-manipulation-with-data-table-solution-part-2).  
+
+If you obtained a different (correct) answer than those listed on the solutions page, please feel free to post your answer as a comment on that page.  
+
+## Exercise 1
+
+Create a `data.table` from `diamonds` dataset, create key using setkey over `cut` and `color`. Now select first entry of the groups `Ideal` and `Premium`.  
+
+```{r exercise-1, message=FALSE}
+library(data.table)
+library(ggplot2)
+
+dt <- diamonds
+setDT(dt)
+
+setkey(dt, cut, color)
+dt[c("Ideal","Premium"), mult = "first"]
+```
+
+## Exercise 2
+
+With the same dataset, select the first and last entry of the groups `Ideal` and `Premium`.  
+
+```{r exercise-2, message=FALSE}
+dt[c("Ideal", "Premium"), .SD[c(1, .N)], by = .EACHI]
+```
+
+## Exercise 3
+
+Earlier we have seen how we can create/update columns by reference using `:=`. However there is a lower over head, faster alternative in `data.table`. This is achieved by `SET` and `Loop` in `data.table`, however this is meant for simple operations and will not work in grouped operation. Now take the `diamonds` `data.table` and make columns `x`, `y`, `z` value squared. For example if the value is currently 10, the resulting value would be 100. You are awesome if you find out all alternative answer and check the time using `system.time`.  
+
+```{r exercise-3}
+system.time(dt1 <- dt[, `:=` (x_sqr = x^2, y_sqr = y^2, z_sqr = z^2)])
+dt1
+
+# cols = c("x","y","z")
+# system.time(for (i in cols) dt2 <- set(dt, j = i, value = dt[[i]]^2))
+# dt2
+```
+
+## Exercise 4
+
+In the same dataset, capitalize first letter of column names. 
+ 
+```{r exercise-4, message=FALSE}
+library(R.utils)
+setnames(dt, names(dt), capitalize(names(dt)))
+dt
+```
+
+## Exercise 5
+
+Reordering column sometimes is necessary, however if your data frame is of several GBs it might be a overhead to create new data frame with new order. `Data.Table` provides features to overcome this. Now reorder your `diamonds` `data.table`'s column by sorting alphabetically.  
+ 
+```{r exercise-5}
+setcolorder(dt, sort(names(dt)))
+dt
+```
+
+## Exercise 6
+
+If you are not convinced with the powerful intuitive features of `data.table` till now, I am pretty sure you will by the end of THIS. Suppose I want to have a metric on `diamonds` where I want to find for each group of `cut` `maximum of x * mean of depth` and name it `my_int_feature` and also I want another metric which is `my_int_feature \* maximum of y` again for each group of `cut`. This is achievable by chaining but also with a single operation without chaining which is the expected answer.  
+ 
+```{r exercise-6}
+dt <- diamonds
+setDT(dt)
+dt1 <- dt
+# Method 1
+dt1[, .(my_int_feature = my_int_feature <- max(x) * mean(depth), 
+        my_int_feature2 = my_int_feature * max(y)), 
+    by = cut]
+
+# Method 2
+dt2 <- dt
+dt2[, {m = mean(depth)
+       my_int_feature = max(x) * m
+       my_int_feature2 = max(y) * my_int_feature
+       list("my_int_feature" = my_int_feature, 
+            " my_int_feature2" = my_int_feature2
+            )
+       },
+    by = cut]
+```
+
+## Exercise 7
+
+Suppose we want to merge `iris` and `airquality`, akin to the functionlaity of `rbind`. We want to do it fast and want to keep track of the rows with their original dataset, and keep all the columns of both the data set in the merged data set as well, How do we achieve that?  
+
+```{r exercise-7}
+iris_dt <- data.table(iris)
+aq <- data.table(airquality)
+
+rbindlist(list("iris" = iris_dt,"aq" = aq), fill = TRUE, idcol = "id")
+```
+
+## Exercise 8
+
+The Next 3 exercises are on rolling Join like features of `data.table`, which is useful in time series like data. Create a `data.table` with the following  
+```
+set.seed(1024)
+x <- data.frame(rep(letters[1:2],6),c(1,2,3,4,6,7),sample(100,6))
+names(x) <- c("id","day","value")
+test_dt <- setDT(x)  
+```
+
+Now this mimics a sales data of `7` days for `a` and `b`. Notice that day `5` is not present for both `a` and `b`. This is not desirable in many situations, A common practise is to use the previous days data. How do we get previous days data for the `id a`, You should ideally set keys and do it using join features.  
+
+```{r exercise-8}
+set.seed(1024)
+x <- data.frame(rep(letters[1:2],6), c(1,2,3,4,6,7), sample(100,6))
+names(x) <- c("id", "day", "value")
+test_dt <- setDT(x)  
+test_dt
+setkey(test_dt, id, day)
+test_dt
+test_dt[.("a", 5), roll = TRUE]
+```
+
+
+## Exercise 9
+
+May be you dont want the previous day’s data, you may want to copy the nearest value for day `5`, How do we achieve that?  
+
+```{r exercise-9}
+test_dt[.("a", 5), roll = "nearest"]
+```
+
+## Exercise 10
+
+Now there may be a case when you don't want to copy any value if the date is beyond last observation. Use your answer for question 8 to find the value for `day` `5` and `9` for `b`, Now since `9` falls beyond last observation of 7 you might want to avoid copying it. How do you explicitly tell your `data.table` to stop when it sees last observation and don’t copy previous value. This may not seem useful since you know that here `9` falls beyond `7`, but imagine you have a series of data points and you don’t really want to copy data to observations after your last observation. This might come handy in such cases.  
+
+```{r exercise-10}
+test_dt[.("b", c(5, 9)), roll = TRUE, rollends = FALSE]
+```
