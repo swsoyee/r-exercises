@@ -1,7 +1,7 @@
 ---
 title: 'Data Manipulation with Data Table - Part 1'
 author: "Biswarup Ghosh"
-date: "15 June 2017 "
+date: "15 June 2017"
 output: rmarkdown::github_document
 ---
 
