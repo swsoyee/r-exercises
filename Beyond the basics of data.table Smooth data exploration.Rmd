@@ -1,7 +1,7 @@
 ---
-title: 'Beyond the basics of data.table: Smooth data exploration'
-author: "sindri"
-date: "6 September 2017"
+title: 'Practice Your ggplot Skills: Exercises'
+author: "Jakub Kwiecien"
+date: "23 February 2018"
 output: rmarkdown::github_document
 ---
 
@@ -9,115 +9,113 @@ output: rmarkdown::github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-![](https://www.r-exercises.com/wp-content/uploads/2017/08/33232402401_03b48d3268_m.jpg)
+![](https://www.r-exercises.com/wp-content/uploads/2018/02/iris.png)
 
-This exercise set provides practice using the fast and concise data.table package. If you are new to the syntax it is recommended that you start by solving [the set on the basics of data.table](http://www.r-exercises.com/2017/08/23/basics-of-data-table-smooth-data-exploration/) before attempting this one.  
+`ggplot2` is a great tool for complex data visualization. Let’s practice it a bit!  
 
-We will use data on used cars (Toyota Corollas) on sale during 2004 in the Netherlands. There are 1436 observations with information on the price at which it is offered for sale, age, mileage and more, see full variable description [here](http://www.r-exercises.com/2017/08/31/data-description-for-exercise-beyond-the-basics-of-data-table-smooth-data-exploration).  
+Answers to these exercises are available [here](http://r-exercises.com/2018/02/23/practice-you-ggplot-skills-solutions/).  
 
-Answers are available [here](http://www.r-exercises.com/2017/09/06/beyond-the-basics-of-data-table-smooth-data-exploration-solutions).  
+For each exercise, please replicate the given graph. Some exercises require additional data wrangling. If you obtained a different (correct) answer than those listed on the solutions page, please feel free to post your answer as a comment on that page.  
 
 ## Exercise 1
 
-Load the [data](http://www.r-exercises.com/wp-content/uploads/2017/08/toy_cor.csv) available to your working environment using `fread()`, don’t forget to load the `data.table` package first.  
+Fancy the `iris` dot-plot.   
+![](https://www.r-exercises.com/wnw-images/wp-content/uploads/2018/02/ggplot-exercises-1.pngmin.png)
 
 ```{r exercise-1, message=FALSE}
-library(data.table)
+library(ggplot2)
+library(dplyr)
 
-df <- fread("http://www.r-exercises.com/wp-content/uploads/2017/08/toy_cor.csv")
-df
+ggplot(data = iris, aes(x = Sepal.Length, 
+                        y = Sepal.Width,
+                        color = Species,
+                        shape = Species)) + 
+  geom_point() + 
+  stat_density2d() +
+  theme_light() +
+  ggtitle("IRIS")
 ```
 
 ## Exercise 2
 
-Using one line of code print out the most common car model in the data, and the number of times it appears.  
+Faceted smoothing (`iris`, once again).  
+![](https://www.r-exercises.com/wnw-images/wp-content/uploads/2018/02/ggplot-exercises-2.pngmin.png)
 
 ```{r exercise-2}
-df[, .N, by = Model][order(-N)][1]
+iris %>%
+  mutate(Species = 'ALL') %>%
+  bind_rows(iris) %>%
+  ggplot(aes(x = Sepal.Length, y = Sepal.Width, color = Species)) + 
+  geom_point() + 
+  geom_smooth() +
+  facet_wrap(facets =~ Species, scales = "free") +
+  theme_bw()
 ```
 
 ## Exercise 3
 
-Print out the mean and median price of the 10 most common models.  
+Tufte style mtcars.  
+![](https://www.r-exercises.com/wnw-images/wp-content/uploads/2018/02/ggplot-exercises-3.pngmin.png)
 
 ```{r exercise-3}
-df[, .(.N, 
-       meanPrice = mean(Price), 
-       medianPrice = median(Price)
-       ), by = Model][order(-N)][1:10]
+mtcars %>%
+  mutate(rank = rank(mpg, ties.method = "first"), name = rownames(mtcars)) %>%
+  ggplot(aes(x = mpg, y = rank, label = name)) +
+  geom_point() +
+  geom_text(nudge_x = .2, hjust = "left") +
+  xlab('Miles per gallon fuel consumption') +
+  xlim(10, 40) +
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0, size = 16),
+        axis.title.x = element_text(face = 'bold'),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.line.y = element_blank())
 ```
 
 ## Exercise 4
 
-Delete all columns that have `Guarantee` in its name.  
+`mtcars` bubble-plot.  
+![](https://www.r-exercises.com/wnw-images/wp-content/uploads/2018/02/ggplot-exercises-4.pngmin.png)
  
 ```{r exercise-4, message=FALSE}
-names(df)
-df[, grep(pattern = "Guarantee", names(df)) := NULL]
-names(df)
+mtcars %>%
+  ggplot(aes(x = mpg, y = qsec, size = disp, color = as.factor(am))) + 
+  geom_point() +
+  scale_colour_discrete(name  ="Gear",
+                        breaks=c(0, 1),
+                        labels=c("Manual", "Automatic")) +
+  scale_size_continuous(name = 'Displacement') +
+  xlab("Miles per gallon") +
+  ylab("1/4 mile time") +
+  theme_light()
 ```
 
 ## Exercise 5
 
-Add a new column which is the squared deviation of `price` from the average `price` of cars the same `color`.  
+Polar barplot of the mean diamond `price` per `cut` and `color`.  
  
 ```{r exercise-5}
-df[, sq_dev_by_colorl := (Price - mean(Price))^2,  by = Color]
-df
+diamonds %>%
+  group_by(cut, color) %>%
+  mutate(meanPrice = mean(price)) %>%
+  ggplot(aes(x = cut, y = meanPrice, fill = color, group = cut, label = cut)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_polar()
 ```
 
 ## Exercise 6
 
-Use a combintation of `.SDcols` and `lapply` to get the `mean` value of columns `18` through `35`.    
+Economist style `economics` time series. (Hint: you will need the `ggthemes` package.)    
  
 ```{r exercise-6}
-df[, lapply(.SD, mean), .SDcols = 18:35]
-```
-
-## Exercise 7
-
-Print the most common `color` by `age` in years?  
-
-```{r exercise-7}
-df[, (.N), by = .(Years = floor(Age_08_04/12), Color)][order(Years, V1), .SD[.N], by = Years]
-```
-
-## Exercise 8
-
-For the dummy variables in columns `18:35` recode `0` to `-1`. You might want to use the `set` function here.  
-
-```{r exercise-8}
-df
-# df[, lapply(.SD, function(x) replace(x, which(x == 0), -1)), .SDcols = 18:35]
-
-for (j in 18:35) {
-  set(df,
-      i = df[, which(.SD == 0), .SDcols = j],
-      j = j,
-      value = -1)
-}
-df
-```
-
-
-## Exercise 9
-
-Use the `set` function to add “yuck!” to the varible `Fuel_Type` if it is not `Petrol`. Just because…  
-
-```{r exercise-9}
-# df[, lapply(.SD, function(x) replace(x, which(x != "Petrol"), "yuck!")), .SDcol = "Fuel_Type"]
-
-set(df,
-    i =  df[, which(Fuel_Type == "Petrol")],
-    j = "Fuel_Type",
-    value = "Petrol yuck!")
-```
-
-## Exercise 10
-
-Using `.SDcols` and one command create two new variables, `log` of `Weight` and `Price`.  
-
-```{r exercise-10}
-df[, (c("logWeight", "logPrice")) := lapply(.SD, log), .SDcols = c("Weight", "Price")]
-df
+economics %>%
+  ggplot(aes(x = date, y = uempmed)) + 
+  geom_line() +
+  expand_limits(y  = 0) +
+  ggtitle("Median duration of unemployment [weeks]") +
+  ylab("Median duration of unemployment [weeks]") +
+  ggthemes::theme_economist_white() +
+  theme(axis.title.x = element_blank())
 ```
