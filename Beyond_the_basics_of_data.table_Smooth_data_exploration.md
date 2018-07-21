@@ -110,9 +110,7 @@ mtcars %>%
 
 ## Exercise 5
 
-Polar barplot of the mean diamond `price` per `cut` and
-`color`.  
-![](https://www.r-exercises.com/wp-content/uploads/2018/02/ggplot-exercises-5.png)
+Polar barplot of the mean diamond `price` per `cut` and `color`.
 
 ``` r
 # Copy from solution page 
@@ -140,9 +138,7 @@ diamonds2plot  %>%
 ## Exercise 6
 
 Economist style `economics` time series. (Hint: you will need the
-`ggthemes`
-package.)  
-![](https://www.r-exercises.com/wp-content/uploads/2018/02/ggplot-exercises-6.png)
+`ggthemes` package.)
 
 ``` r
 economics %>%
