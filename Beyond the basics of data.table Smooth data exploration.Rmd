@@ -97,7 +97,7 @@ mtcars %>%
 Polar barplot of the mean diamond `price` per `cut` and `color`.  
  
 ```{r exercise-5}
-# Copy from solution page 
+# Copy from solution page.
 diamonds2plot <- diamonds %>%
   group_by(cut, color) %>%
   summarise(price = mean(price)) %>%
