@@ -97,24 +97,12 @@ mtcars %>%
 Polar barplot of the mean diamond `price` per `cut` and `color`.  
  
 ```{r exercise-5}
-# Copy from solution page 
-diamonds2plot <- diamonds %>%
+diamonds %>%
   group_by(cut, color) %>%
-  summarise(price = mean(price)) %>%
-  arrange(color, price) %>%
-  ungroup() %>%
-  mutate(id = row_number(),
-         angle = 90 - 360 * (id - 0.5) / n())
-
-diamonds2plot  %>%
-  ggplot(aes(factor(id), price, fill = color, group = cut, label = cut)) +
-  geom_bar(stat = 'identity', position = 'dodge') +
-  geom_text(hjust = 0, angle = diamonds2plot$angle, alpha = .5) +
-  coord_polar() +
-  ggtitle('Mean dimond price') +
-  ylim(-3000, 7000) +
-  theme_void() +
-  theme(plot.title = element_text(hjust = 0.5, size = 16, face = 'bold'))
+  mutate(meanPrice = mean(price)) %>%
+  ggplot(aes(x = cut, y = meanPrice, fill = color, group = cut, label = cut)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_polar()
 ```
 
 ## Exercise 6
