@@ -40,8 +40,7 @@ Solutions of [R-exercises.com](https://www.r-exercises.com/).
 
 ### 4. `ggplot`
 
-| 🗓️Date            | 📚Source                                                      | 🛠️Code                                                        | 📝Report                                                      |
-| :--------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| 2 June 2018      | [How To Plot With Patchwork: Exercises](https://www.r-exercises.com/2018/06/02/how-to-plot-with-patchwork-exercises/) | [Link](https://github.com/swsoyee/r-exercises/blob/master/How%20To%20Plot%20With%20Patchwork%20Exercises.Rmd) | [Link](https://github.com/swsoyee/r-exercises/blob/master/How_To_Plot_With_Patchwork_Exercises.md) |
-| 23 February 2018 | [Practice Your ggplot Skills: Exercises](https://www.r-exercises.com/2018/02/23/practice-you-ggplot-skills-exercises/) | [Link]()                                                     | [Link]()                                                     |
+| 🗓️Date       | 📚Source                                                      | 🛠️Code                                                        | 📝Report                                                      |
+| :---------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 2 June 2018 | [How To Plot With Patchwork: Exercises](https://www.r-exercises.com/2018/06/02/how-to-plot-with-patchwork-exercises/) | [Link](https://github.com/swsoyee/r-exercises/blob/master/How%20To%20Plot%20With%20Patchwork%20Exercises.Rmd) | [Link](https://github.com/swsoyee/r-exercises/blob/master/How_To_Plot_With_Patchwork_Exercises.md) |
 
