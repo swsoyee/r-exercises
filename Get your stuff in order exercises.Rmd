@@ -1,0 +1,138 @@
+---
+title: 'Get your stuff in order exercises'
+author: "Han de Vries"
+date: "1 March 2016"
+output: rmarkdown::github_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](http://www.r-exercises.com/wp-content/uploads/2016/03/Sorting_quicksort_anim.gif)
+
+In the exercises below we cover the basics of ordering vectors, matrices and data frames. We consider both column-wise and row-wise ordering, single and multiple variables, ascending and descending sorting, and sorting based on numeric, character and factor variables. Before proceeding, it might be helpful to look over the help pages for the `sort`, `order`, and `xtfrm` functions.  
+
+Answers to the exercises are available [here](http://www.r-exercises.com/2016/03/01/get-your-stuff-in-order-solutions/).  
+
+If you obtained a different (correct) answer than those listed on the solutions page, please feel free to post your answer as a comment on that page.  
+
+## Exercise 1
+
+Sort the vector `x <- c(1, 3, 2, 5, 4)` in:  
+
+a. ascending order  
+b. descending order  
+
+```{r exercise-1, message=FALSE}
+x <- c(1, 3, 2, 5, 4)
+# a. ascending order  
+sort(x)
+# b. descending order  
+sort(x, decreasing = TRUE)
+```
+
+## Exercise 2  
+
+Sort the matrix `x <- matrix(1:100, ncol=10)`:  
+a. in descending order by its second column (call the sorted matrix x1)  
+b. in descending order by its second row (call the sorted matrix x2)  
+
+```{r exercise-2, message=FALSE}
+x <- matrix(1:100, ncol=10)
+x
+# a. in descending order by its second column  
+x1 <- x[order(x[, 2], decreasing = TRUE),]
+x1
+# b. in descending order by its second row  
+x2 <- x[, order(x[2, ], decreasing = TRUE)]
+x2
+```
+
+## Exercise 3
+
+Sort only the first column of x in descending order.  
+
+```{r exercise-3, message=FALSE}
+x[, 1] <- sort(x[, 1], decreasing = TRUE)
+x
+```
+
+## Exercise 4  
+
+Consider the `women` data.  
+a. Confirm that the data are sorted in increasing order for both the height and weight variable, without looking at the data.  
+b. Create a new variable bmi, based on the following equation: BMI = ( Weight in Pounds / (Height in inches) x (Height in inches) ) x 703. Check, again without looking at the data, whether BMI increases monotonically with weight and height.  
+c. Sort the dataframe on bmi, and its variable names alphabetically.  
+
+```{r exercise-4, message=FALSE}
+library(data.table)
+dt <- women
+setDT(dt)
+sapply(dt, is.unsorted)
+dt[, bmi := weight / height^2 * 703]
+sapply(dt, is.unsorted)
+setorder(dt, bmi)
+dt
+```
+
+## Exercise 5  
+
+Consider the `CO2` data.  
+a. Sort the data based on the Plant variable, alphabetically. (Note that Plant is a factor!). Check that the data are sorted correctly by printing the data on the screen.  
+b. Sort the data based on the uptake (increasing) and Plant (alphabetically) variables (in that order).  
+c. Sort again, based on uptake (increasing) and Plant (reversed alphabetically), in that order.  
+
+```{r exercise-5, message=FALSE}
+dt <- CO2
+setDT(dt)
+# a. Sort the data based on the Plant variable, alphabetically.
+dt$Plant <- factor(dt$Plant, levels = sort(levels(dt$Plant)))
+setorder(dt, Plant)
+head(dt)
+# b. Sort the data based on the uptake (increasing) and Plant (alphabetically) variables.
+setorderv(dt, c("uptake", "Plant"))
+head(dt)
+# c, Sort again, based on uptake (increasing) and Plant (reversed alphabetically).
+setorderv(dt, c("uptake", "Plant"), c(1, -1))
+head(dt)
+```
+
+## Exercise 6
+
+Create a dataframe df with 40 columns, as follows:  
+`df <- as.data.frame(matrix(sample(1:5, 2000, T), ncol=40))`   
+a. Sort the dataframe on all 40 columns, from left to right, in increasing order.  
+b. Sort the dataframe on all 40 columns, from left to right, in decreasing order.  
+c. Sort the dataframe on all 40 columns, from right to left, in increasing order.  
+
+```{r exercise-6, message=FALSE}
+library(plotly)
+df <- as.data.frame(matrix(sample(1:5, 2000, T), ncol = 40))
+# A.
+# Answer by author
+adf <- df[do.call(order, df), ]
+# My solution
+setDT(df)
+setorderv(df, cols = colnames(df))
+# Compare
+subplot(plot_ly(z = data.matrix(adf), type = "heatmap"), 
+        plot_ly(z = data.matrix(df), type = "heatmap"))
+
+# B.
+# Answer by author
+bdf <- df[do.call(order, -df), ]
+# My solution
+setorderv(df, cols = colnames(df), order = -1)
+# Compare
+subplot(plot_ly(z = data.matrix(bdf), type = "heatmap"), 
+        plot_ly(z = data.matrix(df), type = "heatmap"))
+
+# C.
+# Answer by author
+cdf <- df[do.call(order, rev(df)), ]
+# My solution
+setorderv(df, cols = rev(colnames(df)))
+# Compare
+subplot(plot_ly(z = data.matrix(cdf), type = "heatmap"), 
+        plot_ly(z = data.matrix(df), type = "heatmap"))
+```
