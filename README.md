@@ -3,7 +3,17 @@
 
 Solutions of [R-exercises.com](https://www.r-exercises.com/).
 
-## Package exercise
+## Machine Learning exercises
+### 1. `Clustering`
+
+| 🗓️Date         | 📚Source                                                      | 🛠️Code                                                        | 📝Report                                                      |
+| :------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 13 April 2018 | [K-Means Clustering in R – Exercises](https://www.r-exercises.com/2018/04/13/11256/) | [Link](https://github.com/swsoyee/r-exercises/blob/master/K-Means%20Clustering%20in%20R%20%E2%80%93%20Exercises.Rmd) | [Link](https://github.com/swsoyee/r-exercises/blob/master/K-Means_Clustering_in_R_%E2%80%93_Exercises.md) |
+
+
+
+
+## Package exercises
 ### 1. `base`
 
 | 🗓️Date        | 📚Source                                                      | 🛠️Code                                                        | 📝Report                                                      |
