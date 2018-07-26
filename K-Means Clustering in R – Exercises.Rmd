@@ -109,5 +109,86 @@ table(cluster2, cluster3)
 Standardize your new data-set so that each variable has a mean of 0 and a variance of 1; check once more if multiplying by two makes a difference.  
 
 ```{r exercise-6, message=FALSE}
+# Standardize dataset (with "Petal.Width" doubled)
+ds <- data.frame(scale(d[, 1:4]))
+# Get the columns with sepal and petal measurements
+col <- colnames(ds)[grepl("sepal|petal", tolower(colnames(ds)))]
+# Feed the columns into k-means
+set.seed(1)
+model <- kmeans(ds[col], centers = 3)
+# Save the cluster vector of each observation
+cluster4 <- model$cluster
 
+# Standardize dataset (original)
+d <- data.frame(scale(iris[, 1:4]))
+# Get the columns with sepal and petal measurements
+col <- colnames(d)[grepl("sepal|petal", tolower(colnames(d)))]
+# Feed the columns into k-means
+set.seed(1)
+model <- kmeans(d[col], centers = 3)
+# Save the cluster vector of each observation
+cluster5 <- model$cluster
+
+# Check the differences (After Standardization, double any variable has no affection to the result)
+table(cluster4, cluster5)
+```
+
+## Exercise 7
+
+Read in the Titanic `train.csv` data-set from [Kaggle.com](https://www.kaggle.com/c/titanic/data) (you might have to sign up first). Turn the sex column into a dummy variable, =1, if it is male, “0” otherwise, and “Pclass” into a dummy variable for the most common class 3. Using four columns, `Sex`, `SibSp`, `Parch` and `Fare`, apply the k-means algorithm to get 4 clusters and use `nstart=20`. Remember to set the seed to 1 so the results are comparable. Note that these four variables have no special meaning to the problem and dummy data in k-means is probably not a good idea in general – we are just playing around.
+
+```{r exercise-7, message=FALSE}
+tita <- read.csv("data/tita_train.csv")
+
+# Turn the sex column into a dummy variable, =1, if it is male, “0” otherwise
+levels(tita$Sex)
+tita$Sex <- ifelse(tita$Sex == "male", 1, 0)
+# And “Pclass” into a dummy variable =1 for the most common class 3
+tita$Pclass <- ifelse(tita$Pclass == 3, 1, 0)
+
+tita_si <- scale(tita[, c("Sex", "SibSp", "Parch", "Fare")])
+set.seed(1)
+tita_kmeans <- kmeans(tita_si, centers = 4)
+```
+
+## Exercise 8
+
+Now, how would you describe, in words, each of the clusters and what the survival rates were?    
+
+```{r exercise-8, message=FALSE}
+tita_kmeans$centers
+# Cluster description:
+# 1: Male, low fare, not travelling with family
+# 2: Mostly female, very high fare (rich?), some family
+# 3: Female, alone, a bit lower fair
+# 4: Individuals with lots of family and about average fare
+
+tita_cluster <- tita_kmeans$cluster
+tita_table <- table(tita$Survived, tita_cluster)
+tita_table[2, ] / colSums(tita_table) * 100
+# Females had beter survival chance.
+```
+
+## Exercise 9
+
+Now, 4 clusters was an arbitrary choice. Apply k-means clustering using nstart=20, but using k from 2 to 20 and store the result.  
+
+```{r exercise-9, message=FALSE}
+model <- sapply(2:20, function(x) kmeans(tita_si, centers = x, nstart = 20))
+```
+
+## Exercise 10
+
+Plot the percent of variance explained by the clusters (between sum of squares over the total sum of squares). What seems like a reasonable number of clusters, according to the [elbow method](https://en.wikipedia.org/wiki/Determining_the_number_of_clusters_in_a_data_set#The_elbow_method)?  
+
+```{r exercise-10, message=FALSE}
+wss <- sapply(1:19, function(x) model[, x]$betweenss / model[, x]$totss)
+
+# Four clusters is OK
+qplot(x = 1:19, y = wss) + 
+  geom_line() + 
+  ggtitle("Number of Clusters with Sum of Squares value") +
+  xlab("Number of Clusters") + 
+  ylab("Between Sum of Squares / Total Sum of Squares") +
+  theme_bw()
 ```
