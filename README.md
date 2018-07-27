@@ -12,6 +12,14 @@ Solutions of [R-exercises.com](https://www.r-exercises.com/).
 
 
 
+### 2. Regression
+
+| 🗓️Date           | 📚Source                                                      | 🛠️Code                                                        | 📝Report                                                      |
+| :-------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 4 December 2017 | [Predicting Housing Prices with Linear Regression Exercises](https://www.r-exercises.com/2017/12/04/boston-regression-exercises/) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Predicting%20Housing%20Prices%20with%20Linear%20Regression%20Exercises.Rmd) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Predicting_Housing_Prices_with_Linear_Regression_Exercises.md) |
+
+### 
+
 
 ## Package exercises
 ### 1. `base`
