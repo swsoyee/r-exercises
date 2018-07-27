@@ -1,0 +1,153 @@
+---
+title: 'Predicting Housing Prices with Linear Regression Exercises'
+author: "Thomas Pinder"
+date: "4 December 2017"
+output: rmarkdown::github_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](https://www.r-exercises.com/wp-content/uploads/2017/11/boston-2.png)
+
+Regression techniques are a crucial skill in any data scientist or statisticians toolkit. It is even crucial for people who are unfamiliar with regression modeling. It is a nice way to introduce yourself to the topic through a simple linear model.  
+
+A linear model is an explanation of how a continuous response variable behaves, dependent on a set of covariates or explanatory variables. Whilst often insufficient to explain complex problems, linear models do present underlying skills, such as variable selection and diagnostic examinations. Therefore, a worthwhile introduction to statistical regression techniques.  
+
+In this tutorial, we’ll be creating a couple of linear models and comparing the performance of them on the Boston Housing dataset. This tutorial will require caret and mlbench to be installed and you may find ggplot2 and dplyr useful too, though these are not essential.  
+
+Solutions to these exercises can be found [here](https://www.r-exercises.com/2017/12/04/boston-regression-solutions/).
+
+## Exercise 1
+
+Load the Boston Housing dataset from the `mlbench` library and inspect the different types of variables present.  
+
+```{r exercise-1, message=FALSE}
+library(mlbench)
+data("BostonHousing")
+housing <- BostonHousing
+str(housing)
+```
+
+## Exercise 2  
+
+Explore and visualize the distribution of our target variable.  
+
+```{r exercise-2, message=FALSE}
+library(plotly)
+
+fit <- density(housing$medv)
+
+plot_ly(data = housing, 
+        x =~ medv, 
+        type = "histogram", 
+        name = "Histogram") %>% 
+  add_trace(x = fit$x, 
+            y = fit$y, 
+            type = "scatter", 
+            mode = "lines", 
+            fill = "tozeroy", 
+            yaxis = "y2", 
+            name = "Density") %>%
+  layout(yaxis2 = list(overlaying = "y", 
+                       title = "Density",
+                       side = "right"),
+         yaxis = list(title = "Count"),
+         title = "Histogram & Density Plot of Median Value House Price in Boston",
+         xaxis = list(title = "Median Value ($1000s)")
+         )
+```
+
+## Exercise 3
+
+Explore and visualize any potential correlations between `medv` and the variables `crim`, `rm`, `age`, `rad`, `tax` and `lstat`.  
+
+```{r exercise-3, message=FALSE}
+library(data.table)
+library(ggplot2)
+setDT(housing)
+
+dt <- melt(data = housing[, .(crim, rm, age, rad, tax, lstat, medv)], id.vars = "medv")
+head(dt)
+ggplot(data = dt, aes(x = value, y = medv, color = variable)) +
+  geom_point() +
+  stat_smooth(color = "black") +
+  facet_wrap(.~variable, scales = "free") +
+  labs(x = "Variable Value", y = "Median House Price ($1000s)", 
+       title = "Correlations between medv and the variables") +
+  theme_bw()
+```
+
+## Exercise 4  
+
+Set a seed of 123 and split your data into a train and test set using a 75/25 split. You may find the `caret` library helpful here.  
+
+```{r exercise-4, message=FALSE}
+library(caret)
+set.seed(123)
+to_train <- createDataPartition(y = housing$medv, p = 0.75, list = FALSE)
+train <- housing[to_train, ]
+test <- housing[-to_train, ]
+```
+
+## Exercise 5  
+
+We have seen that `crim`, `rm`, `tax`, and `lstat` could be good predictors of `medv`. To get the ball rolling, let us fit a linear model for these terms.    
+
+```{r exercise-5, message=FALSE}
+lm.model <- lm(formula = medv ~ crim + rm + tax + lstat,
+               data = housing)
+lm.model
+rs <- summary(lm.model)
+rs
+```
+
+## Exercise 6
+
+Obtain an r-squared value for your model and examine the diagnostic plots found by plotting your linear model.  
+
+```{r exercise-6, message=FALSE}
+rs$r.squared
+plot(lm.model)
+```
+
+## Exercise 7
+
+We can see a few problems with our model immediately with variables such as 381 exhibiting a high leverage, a poor QQ plot in the tails a relatively poor r-squared value.
+Let us try another model, this time transforming MEDV due to the positive skewness it exhibited.  
+
+```{r exercise-7, message=FALSE}
+lm.log.model <- lm(log(medv) ~ crim + rm + tax + lstat, data = train)
+lm.log.model
+summary(lm.log.model)
+```
+
+## Exercise 8
+
+Examine the diagnostics for the model. What do you conclude? Is this an improvement on the first model?  
+One assumption of a linear model is that the mean of the residuals is zero. You could try and test this.      
+
+```{r exercise-8, message=FALSE}
+plot(lm.log.model)
+```
+
+## Exercise 9
+
+Create a data frame of your predicted values and the original values.  
+
+```{r exercise-9, message=FALSE}
+result <- data.frame(original = test$medv, predict = exp(predict(lm.log.model, test)))
+```
+
+## Exercise 10
+
+Plot this to visualize the performance of your model.  
+
+```{r exercise-10, message=FALSE}
+ggplot(data = result, aes(x = predict, y = original)) +
+  geom_point() + 
+  geom_smooth() +
+  labs(x = "Predicted Values", y = "Original Values", 
+       title = "Predicted vs. Original Values") +
+  theme_bw()
+```
