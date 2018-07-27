@@ -17,6 +17,7 @@ Solutions of [R-exercises.com](https://www.r-exercises.com/).
 | 🗓️Date           | 📚Source                                                      | 🛠️Code                                                        | 📝Report                                                      |
 | :-------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | 4 December 2017 | [Predicting Housing Prices with Linear Regression Exercises](https://www.r-exercises.com/2017/12/04/boston-regression-exercises/) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Predicting%20Housing%20Prices%20with%20Linear%20Regression%20Exercises.Rmd) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Predicting_Housing_Prices_with_Linear_Regression_Exercises.md) |
+| 14 October 2017 | [Regression Model Assumptions Exercises](https://www.r-exercises.com/2017/10/14/regression-model-assumptions-exercises/) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Regression%20Model%20Assumptions%20Exercises.Rmd) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Regression_Model_Assumptions_Exercises.md) |
 
 ### 
 
