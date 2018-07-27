@@ -4,7 +4,7 @@
 Solutions of [R-exercises.com](https://www.r-exercises.com/).
 
 ## Machine Learning exercises
-### 1. `Clustering`
+### 1. Clustering
 
 | 🗓️Date         | 📚Source                                                      | 🛠️Code                                                        | 📝Report                                                      |
 | :------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -14,10 +14,11 @@ Solutions of [R-exercises.com](https://www.r-exercises.com/).
 
 ### 2. Regression
 
-| 🗓️Date           | 📚Source                                                      | 🛠️Code                                                        | 📝Report                                                      |
-| :-------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| 4 December 2017 | [Predicting Housing Prices with Linear Regression Exercises](https://www.r-exercises.com/2017/12/04/boston-regression-exercises/) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Predicting%20Housing%20Prices%20with%20Linear%20Regression%20Exercises.Rmd) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Predicting_Housing_Prices_with_Linear_Regression_Exercises.md) |
-| 14 October 2017 | [Regression Model Assumptions Exercises](https://www.r-exercises.com/2017/10/14/regression-model-assumptions-exercises/) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Regression%20Model%20Assumptions%20Exercises.Rmd) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Regression_Model_Assumptions_Exercises.md) |
+| 🗓️Date            | 📚Source                                                      | 🛠️Code                                                        | 📝Report                                                      |
+| :--------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 27 February 2018 | [R For Hydrologists – Loading and Plotting Data Part 1: Exercises](https://www.r-exercises.com/2018/02/27/r-for-hydrologists-loading-and-plotting-the-data-part-1/) | [Link](https://github.com/swsoyee/r-exercises/blob/master/R%20For%20Hydrologists%20%E2%80%93%20Loading%20and%20Plotting%20Data%20Part%201%20Exercises.Rmd) | [Link](https://github.com/swsoyee/r-exercises/blob/master/R_For_Hydrologists_%E2%80%93_Loading_and_Plotting_Data_Part_1_Exercises.md) |
+| 4 December 2017  | [Predicting Housing Prices with Linear Regression Exercises](https://www.r-exercises.com/2017/12/04/boston-regression-exercises/) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Predicting%20Housing%20Prices%20with%20Linear%20Regression%20Exercises.Rmd) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Predicting_Housing_Prices_with_Linear_Regression_Exercises.md) |
+| 14 October 2017  | [Regression Model Assumptions Exercises](https://www.r-exercises.com/2017/10/14/regression-model-assumptions-exercises/) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Regression%20Model%20Assumptions%20Exercises.Rmd) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Regression_Model_Assumptions_Exercises.md) |
 
 ### 
 
