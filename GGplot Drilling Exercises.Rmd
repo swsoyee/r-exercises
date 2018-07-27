@@ -1,0 +1,142 @@
+---
+title: 'GGplot Drilling: Exercises'
+author: "sindri"
+date: "8 February 2018"
+output: rmarkdown::github_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](https://www.r-exercises.com/wnw-images/wp-content/uploads/2017/12/cat_heart.pngmin.png)
+
+Visualization is a key component to understanding and communicating your understanding to an audience. The more second nature turning your data into plots becomes, the more you can focus on the overall goals instead of being stuck on technical details.  
+
+As a freelance data analyst, I know that often times between when a project arrives at your table until it needs to be delivered is shorter than you would like, leaving limited time to consult documentation and search [Stackoverflow](https://stackoverflow.com/).  
+
+This exercise set is a drilling exercise for the advanced user, but can be completed by a novice with patience and willingness to learn.  
+
+Solutions are available [here](https://www.r-exercises.com/2018/02/08/ggplot-drilling-exercises-solutions/).  
+
+## Exercise 1
+
+Load the `ggplot2`, `MASS` and `viridis` packages. Combine the three [Pima](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/Pima.tr.html) data-sets from (MASS) (used in the previous [exercise set](https://www.r-exercises.com/2017/10/30/logistic-regression-in-r/)) and make a 2D density (density heat map) plot of `bp` versus `bmi` using `scale_fill_viridis()`.
+
+```{r exercise-1, message=FALSE}
+library(ggplot2)
+library(MASS)
+library(viridis)
+library(data.table)
+
+head(Pima.te)
+head(Pima.tr)
+head(Pima.tr2)
+df <- rbind(Pima.te, Pima.tr, Pima.tr2)
+setDT(df)
+df
+
+ggplot(data = df, aes(x = bp, y = bmi)) +
+  stat_density_2d(geom = "raster", aes(fill = stat(density)), contour = FALSE) +
+  scale_fill_viridis() +
+  coord_cartesian(expand = FALSE)
+```
+
+## Exercise 2  
+
+Using the same data, overlay a histogram of `bmi` with a normal density curve using the sample mean and standard deviation.  
+
+```{r exercise-2, message=FALSE}
+ggplot(data = df, aes(x = bmi)) +
+  geom_histogram(aes(y = ..density..), bins = 60) +
+  stat_function(fun = dnorm,
+                args = list(mean = mean(df$bmi, na.rm = TRUE),
+                            sd = sd(df$bmi, na.rm = TRUE)),
+                lwd = 1,
+                col = 'red') +
+  expand_limits(x = 0)
+```
+
+## Exercise 3
+
+Using the `accdeaths` data-set from `MASS`, make a line plot with time on the x-axis. Mark the maximum and minimum value of accidental deaths in a month with a read and blue dot, respectively. Note that the data does not come in ggplot-friendly format.  
+
+```{r exercise-3, message=FALSE}
+accd <- data.frame(deaths = as.matrix(accdeaths),
+                   year = as.numeric(time(accdeaths)))
+head(accd)
+ggplot(accd, aes(x = year, y = deaths)) +
+  geom_line() +
+  geom_point(data = accd[which.min(accd$deaths),],
+             col = "blue", size = 2) +
+  geom_point(data = accd[which.max(accd$deaths),],
+             col = "red", size = 2) +
+  geom_text(data = accd[which.max(accd$deaths),],
+            aes(label = deaths), vjust = 2.2) +
+  geom_text(data = accd[which.min(accd$deaths),],
+            aes(label = deaths), vjust = -2.2) +
+  theme_bw()
+```
+
+## Exercise 4  
+
+The internet surely loves cats, but most users have little idea how much a cat’s organs weigh. Using the `cats` data from the `MASS` package, make two 2D density plot of total weight versus hearth weight, side by side; one for each gender. In addition, add a dot for each observation.  
+
+```{r exercise-4, message=FALSE}
+head(cats)
+ggplot(data = cats, aes(x = Bwt, y = Hwt)) +
+  stat_density2d(geom = "raster", aes(fill = stat(density)), contour = FALSE) +
+  facet_wrap(.~ Sex) +
+  scale_fill_viridis() +
+  coord_cartesian(expand = FALSE) +
+  geom_point(shape = '.', col = 'white') +
+  labs(y = "Heart Weigth (g)", x = "Body Weight (kg)",
+       title = "Body Weight versus hearth weight (by gender)")
+```
+
+## Exercise 5  
+
+Back to the pima data. Make a boxplot for the `glu` (glucose concentration), splitting the observations into five age groups with approximately the same number of observations.  
+
+```{r exercise-5, message=FALSE}
+table(cut_number(df$age, 5))
+ggplot(df, aes(x = age, y = glu)) +
+  geom_boxplot(aes(group = cut_number(age, 5)))
+```
+
+## Exercise 6
+
+Using `ggplot2`'s inbuilt `economics` data-set, make a stacked bar plot with proportions of unemployed to employed (employed or not seeking work) with the date in the x-axis.  
+
+```{r exercise-6, message=FALSE}
+head(economics)
+eco_data <- economics
+setDT(eco_data)
+eco_data[, `:=`(Punemploy = unemploy / pop, Pemploy = (pop - unemploy) / pop)]
+
+ggplot(melt(eco_data, id.vars = "date", measure.vars = c("Punemploy", "Pemploy")), 
+       aes(x = date)) +
+  geom_bar(aes(y = value, fill = variable), stat = "identity", position = "stack") +
+  labs(y = "Percent", x = "Date", main = "Proportions of unemployed to employed")
+```
+
+## Exercise 7  
+
+Now, please create a kernel density estimate for every month and overlap it.  
+
+```{r exercise-7, message=FALSE}
+ggplot(river_data, aes(x = LEVEL,group = MONTH)) +  
+  geom_density()
+```
+
+## Exercise 8  
+
+The plot is very confusing because all curves have the same color. Please assign a discrete set of colors for each month `span`.  
+Hint: You can get the month string using `month.abb[MONTH]` inside the `aes`.
+
+```{r exercise-8, message=FALSE}
+ggplot(river_data, aes(x = LEVEL,group = MONTH, color = month.abb[MONTH])) +  
+  geom_density() +
+  scale_color_discrete(name = "Month") +
+  labs(title = "Density plot of level by month from 2000 to 2006") +
+  theme_bw()
+```
