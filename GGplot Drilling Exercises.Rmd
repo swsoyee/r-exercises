@@ -121,22 +121,81 @@ ggplot(melt(eco_data, id.vars = "date", measure.vars = c("Punemploy", "Pemploy")
 
 ## Exercise 7  
 
-Now, please create a kernel density estimate for every month and overlap it.  
+Using `ggplot2`'s inbuilt `msleep` data-set, make a scatter plot (body weight versus total sleep) of all animals of the order artiodactyla. Mark the domesticated animals with a different color (from black) and annotate their names onto the graph.  
 
 ```{r exercise-7, message=FALSE}
-ggplot(river_data, aes(x = LEVEL,group = MONTH)) +  
-  geom_density()
+ms <- msleep
+setDT(ms)
+subdt <- ms[, group := ifelse(conservation == "domesticated", "Domes", "None")][order == "Artiodactyla"]
+ggplot(data = subdt, aes(x = bodywt, y = sleep_total, color = group)) + 
+  geom_point() +
+  geom_text(data = subdt[group == "Domes"], aes(label = name), vjust = 1.2) +
+  labs(title = "Body weight vs. Total sleep time of Artiodactyla",
+       x = "Body weight (kg)",
+       y = "Total sleep time (hour)") +
+  theme_bw()
 ```
 
 ## Exercise 8  
 
-The plot is very confusing because all curves have the same color. Please assign a discrete set of colors for each month `span`.  
-Hint: You can get the month string using `month.abb[MONTH]` inside the `aes`.
+Using `msleep`, make one density plot for the total sleep, colored by `vore`. Play with the transparency and parameters of the density estimation.  
 
 ```{r exercise-8, message=FALSE}
-ggplot(river_data, aes(x = LEVEL,group = MONTH, color = month.abb[MONTH])) +  
-  geom_density() +
-  scale_color_discrete(name = "Month") +
-  labs(title = "Density plot of level by month from 2000 to 2006") +
+ggplot(data = msleep, aes(x = sleep_total, fill = vore)) +
+  geom_density(alpha = .3, n = 25) +
+  labs(title = "Density plot for the total sleep",
+       y = "Density",
+       x = "Total sleep time (hour)") +
+  theme_bw()
+```
+
+## Exercise 9
+
+Using the Gapminder data, (available from the `gapminder` package) and data from the `rworldmap` package, color countries by life expectancy in 2007. Use the `geom_map`.
+
+```{r exercise-9, message=FALSE}
+library(gapminder)
+library(rworldmap)
+gap <- gapminder
+setDT(gap)
+
+country <- unique(gap$country)
+region <- unique(map_data(map = "world")$region)
+
+# Modify country name
+gap$country <- as.character(gap$country)
+country[!country %in% region]
+# region[grepl(pattern = "Congo", x = region)]
+gap[gap$country == "Congo, Dem. Rep.", ]$country <- "Democratic Republic of the Congo"
+gap[gap$country == "Congo, Rep.", ]$country <- "Republic of Congo"
+gap[gap$country == "United States", ]$country <- "USA"
+gap[gap$country == "United Kingdom", ]$country <- "UK"
+gap[gap$country == "Korea, Rep.", ]$country <- "South Korea"
+gap[gap$country == "Korea, Dem. Rep.", ]$country <- "North Korea"
+gap[gap$country == "Slovak Republic", ]$country <- "Slovakia"
+gap[gap$country == "Yemen, Rep.", ]$country <- "Yemen"
+
+data <- merge(x = gap[year == 2007,],
+              y = map_data(map = "world"), 
+              by.x = "country",
+              by.y = "region",
+              all = TRUE)
+ggplot(data = data) +
+  geom_map(map = map_data(map = "world"), aes(map_id = country, x = long, y = lat, fill = lifeExp)) +
+  theme_bw()
+```
+
+## Exercise 10
+
+Still using the Gapminder data, make a scatter plot with the GDP per capital on a log scale on the x-axis and life expectancy on the y-axis. Map population to size and color to continent. Write a loop that makes a graph for each year and saves it with `ggsave` to your hard drive, so later you can turn it into an animated graph.  
+
+```{r exercise-10, message=FALSE}
+# Failed on installation of `gganimate` package.
+gap <- gapminder
+setDT(gap)
+
+ggplot(data = gap, aes(x = log(gdpPercap), y = lifeExp)) +
+  geom_point(aes(size = pop, color = continent)) +
+  labs(x = "log(GDP per capital)", y = "Life expectancy", title = "Life expectancy vs. GDP") +
   theme_bw()
 ```
