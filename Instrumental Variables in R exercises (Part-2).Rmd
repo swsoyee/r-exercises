@@ -1,0 +1,128 @@
+---
+title: 'Instrumental Variables in R exercises (Part-2)'
+author: "Bassalat Sajjad"
+date: "22 May 2017"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](http://www.r-exercises.com/wp-content/uploads/2017/05/Rplot_set1.jpeg)
+
+This is the second part of the series on Instrumental Variables. For other parts of the series follow the tag [instrumental variables](http://www.r-exercises.com/tag/instrumental-variables/).
+
+In this exercise set we will build on the example from [part-1](http://www.r-exercises.com/2017/05/15/instrumental-variables-in-r-exercises-part-1/).  
+We will now consider an over-identified case i.e. we have multiple IVs for an endogenous variable. We will also look at tests for endogeneity and over-identifying restrictions.  
+
+Answers to the exercises are available [here](http://r-exercises.com/2017/05/22/instrumental-variables-in-r-exercises-part-2-solutions/).  
+
+## Exercise 1
+
+Load the `AER` package (package description:   [here](https://cran.r-project.org/web/packages/AER/AER.pdf)). Next, load `PSID1976` dataset provided with the AER package. This has data regarding labor force participation of married women.  
+Define a new data-frame that has data for all married women that were employed. This data-frame will be used for the following exercises.  
+
+```{r exercise-1, message=FALSE}
+library(data.table)
+library(AER)
+
+data("PSID1976")
+setDT(PSID1976)
+
+df <- PSID1976[participation == "yes"]
+```
+
+## Exercise 2
+
+We will use a more elaborate model as compared to the previous set.  
+Regress `log(wage)` on `education`, `experience` and `experience`^2.  
+
+```{r exercise-2}
+model2 <- lm(log(wage) ~ education + experience + I(experience^2), data = df)
+summary(model2)
+```
+
+## Exercise 3
+
+Previously, we identified `feducation` and `meducation` as possible IVs for `education`.  
+Regress `education` on `experience`, `experience`^2, `feducation` and `meducation`. Comment on your results.  
+
+```{r exercise-3}
+model3 <- lm(education ~ feducation + meducation + experience + I(experience^2), data = df)
+summary(model3)
+```
+
+> Both `feducation` and `meducation` are individually significant.
+
+## Exercise 4
+
+Test the hypothesis that `feducation` and `meducation` are jointly equal to zero.  
+ 
+```{r exercise-4}
+linearHypothesis(model3, c("feducation = 0", "meducation = 0"), test="F")
+```
+
+> Both variables are jointly significant in the model.
+
+## Exercise 5
+
+Use 2SLS to estimate the IV based return to `education`.  
+ 
+```{r exercise-5}
+model5 <- lm(log(wage) ~ experience + I(experience^2) + fitted.values(model3), data = df)
+summary(model5)
+```
+
+## Exercise 6
+
+Use the `ivreg` command to get the same results as in Exercise-5. Note that standard errors would be different.  
+ 
+```{r exercise-6}
+model6 <- ivreg(log(wage) ~ education + experience + I(experience^2) | feducation + meducation + experience + I(experience^2), data = df)
+summary(model6)
+```
+
+> The estimated coefficient of 'feducation' is positive and significant.
+
+## Exercise 7
+
+There is a short form for the `ivreg` command which saves time when we are dealing with numerous variables.  
+Try the short format and check that you get the same results as in Exercise-6.  
+
+```{r exercise-7}
+model7 <- ivreg(log(wage) ~ education + experience + I(experience^2) | .- education +    feducation + meducation,  data = df)
+summary(model7)
+```
+
+## Exercise 8
+
+Regress `log(wage)` on `education`, `experience`, `experience`^2 and residuals from the model estimated in Exercise-3.  
+Use your result to test for the endogeneity of `education`.  
+
+```{r exercise-8}
+model8 <- lm(log(wage) ~ education + experience + I(experience^2) +              residuals(model3), data = df)
+summary(model8)
+```
+> The coefficient for the residuals is significant at the 10% level. We can conclude that education is endogenous.  
+
+## Exercise 9
+
+Regress the residuals from exercise-7 on `experience`, `experience`^2, `feducation` and `meducation`.  
+Use your result to test for over-identifying restrictions.  
+
+```{r exercise-9}
+model9 <- lm(residuals(model7) ~ experience + I(experience^2) + meducation + feducation,
+             data = df)
+names(summary(model9))
+pchisq(summary(model9)$r.squared*428, 1, lower.tail = FALSE)
+```
+> p-value is higher than 5%. So, `meducation` and `feducation` clear the over-identification criteria.  
+
+## Exercise 10
+
+The two tests we did in exercises 8 and 9 can be conveniently obtained using the `summary` command with diagnostics turned on. Verify that you get the same test results with the `summary` command.  
+
+```{r exercise-10}
+summary(model7, diagnostics = TRUE)
+```
