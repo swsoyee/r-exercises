@@ -1,0 +1,96 @@
+---
+title: 'Survival Analysis using GGPlot Exercises (Part 1)'
+author: "Thomas Pinder"
+date: "10 November 2017"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](https://www.r-exercises.com/wp-content/uploads/2017/10/featured-1.png)
+
+Clinical trials can be planned to the very last detail, but that doesn’t prevent people from losing touch with the study, moving abroad, or never experiencing the expected event. That event could be the curing of a disease, platelet counts falling below a certain threshold, or, in undesirable circumstances, death. In all cases where the observation does not experience an event, they are classed as being censored and in these instances, methods such as survival analysis are to be used.  
+
+Using R’s survival library, it is possible to conduct very in-depth survival analysis’ with a huge amount of flexibility and scope of analysis. The only downside to conducting this analysis in R is that the graphics can look very basic, which, whilst fine for a journal article, does not lend itself too well to presentations and posters. Step in the brilliant survminer package, which combines the excellent analytical scope of R with the beautiful graphics of GGPlot.  
+
+In this tutorial, we will use both the survival library and the survminer library to produce Kaplan-Meier plots and analyze log-rank tests. Solutions are available [here](https://www.r-exercises.com/2017/11/10/survival-ggplot-solutions1/).  
+
+## Exercise 1
+
+Load the `lung` data set from the survival library and re-factor the status column as a factor.  
+
+```{r exercise-1, message=FALSE}
+library(data.table)
+library(ggplot2)
+
+dt <- lung
+setDT(dt)
+dt$status <- as.factor(dt$status)
+head(dt)
+```
+
+## Exercise 2
+
+Calculate the percentage of censored observations.  
+
+```{r exercise-2}
+paste0(round(table(dt$status) / nrow(dt) * 100, 1), "%")
+```
+
+## Exercise 3
+
+Create a basic survival object exploring the occurrence of events.  
+
+```{r exercise-3}
+mini.surv <- survfit(Surv(time, status == 2) ~ 1, data = dt)
+```
+
+## Exercise 4
+
+Print this object and plot it to graphically investigate this.  
+ 
+```{r exercise-4}
+print(mini.surv)
+plot(mini.surv)
+```
+
+## Exercise 5
+
+ 
+```{r exercise-5}
+
+```
+
+## Exercise 6
+
+ 
+```{r exercise-6}
+
+```
+
+
+## Exercise 7
+
+```{r exercise-7}
+
+```
+
+## Exercise 8
+
+```{r exercise-8}
+
+```
+
+## Exercise 9
+
+```{r exercise-9}
+
+```
+
+## Exercise 10
+
+```{r exercise-10}
+
+```
