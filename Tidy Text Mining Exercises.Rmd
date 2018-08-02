@@ -86,8 +86,9 @@ for(i in book) {
                    vwidth = 700, 
                    vheight = 500, 
                    delay = 7)
-  cat(paste0("- ", i))
-  cat(paste0('![](', output_path,')"\n'))
+  cat(paste0("- ", i, "\n"))
+  cat("  ")
+  cat(paste0('![](', output_path,')\n'))
   if (file.exists(paste0(i, ".html"))) file.remove(paste0(i, ".html"))
   unlink(paste0(i, "_files"), recursive = TRUE, force = TRUE)
 }
@@ -108,30 +109,68 @@ word_freq %>%
 Perform TF-IDF transformation of the books. Find the words with the highest TF-IDF score for each book.  
  
 ```{r exercise-6}
-
+word_freq %>%
+  group_by(book) %>%
+  mutate(tf = n / sum(n)) %>%
+  arrange(desc(n)) %>%
+  bind_tf_idf(term = word, document = book, n = n) %>%
+  arrange(desc(tf_idf)) %>%
+  filter(row_number() == 1)
 ```
 
 
 ## Exercise 7
 
-```{r exercise-7}
+Create a document-term matrix.  
 
+```{r exercise-7}
+books_tidy %>%
+  count(word) %>%
+  cast_dtm(book, word, n)
 ```
 
 ## Exercise 8
 
-```{r exercise-8}
+Use Bing sentiment lexicon and calculate the overall sentiment of each book.  
 
+```{r exercise-8}
+sentiment_bing <- get_sentiments('bing')
+head(sentiment_bing)
+
+books_tidy %>%
+  inner_join(sentiment_bing) %>%
+  mutate(sentiment = 2*(sentiment == 'positive') - 1) %>%
+  group_by(book) %>%
+  summarise(sentiment = mean(sentiment))
 ```
 
 ## Exercise 9
 
-```{r exercise-9}
+Use NRC sentiment lexicon and calculate how the emotions vary over time in each book. Display results with a plot.  
 
+```{r exercise-9}
+library(ggplot2)
+sentiment_nrc <- get_sentiments('nrc')
+books_tidy %>%
+  group_by(book) %>%
+  mutate(index = line %/% 500) %>%
+  inner_join(sentiment_nrc) %>%
+  group_by(book, index, sentiment) %>%
+  summarise(n = n()) %>%
+  ggplot(aes(index, n, color = sentiment)) +
+  geom_line() +
+  facet_wrap(~book, ncol = 2, scales = "free_x") +
+  theme_bw()
 ```
 
 ## Exercise 10
 
-```{r exercise-10}
+Count the sentences in each book.
 
+```{r exercise-10}
+books %>%
+  group_by(book) %>%
+  unnest_tokens(sentence, text, token = 'sentences') %>%
+  group_by(book) %>%
+  summarise(n = n())
 ```
