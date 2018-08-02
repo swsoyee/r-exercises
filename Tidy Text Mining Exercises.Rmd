@@ -1,0 +1,137 @@
+---
+title: 'Tidy Text Mining Exercises'
+author: "Jakub Kwiecien"
+date: "12 November 2017"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](https://www.r-exercises.com/wp-content/uploads/2017/10/dictionary-1619740_1920.jpg)
+
+Text mining can be messy. Tokenization, document-term matrices, lexicons… Lots of data structures and transformations between them. Fortunately, there is the `tidytext` package, which will help you to tidy this mess!  
+
+Answers to the exercises are available [here](http://r-exercises.com/2017/11/12/tidy-text-mining-solutions/).  
+
+If you obtained a different (correct) answer than those listed on the solutions page, please feel free to post your answer as a comment on that page.   
+
+## Exercise 1
+
+Load `tidytext`, `janeaustenr`, `stringr` and `dplyr` packages. Load Jane Austen`s books and examine how the data looks.  
+
+```{r exercise-1, message=FALSE}
+library(tidytext)
+library(janeaustenr)
+library(stringr)
+library(dplyr)
+
+books <- austen_books()
+head(books)
+summary(books)
+```
+
+## Exercise 2
+
+Add a column identifying the line in a book. Split text into words.  
+
+```{r exercise-2}
+books_tokenized <- books %>%
+  group_by(book) %>%
+  mutate(line = row_number()) %>%
+  unnest_tokens(word, text, token = 'words')
+head(books_tokenized)
+```
+
+## Exercise 3
+
+Remove stopwords.  
+
+```{r exercise-3}
+length(unique(books_tokenized$word))
+head(stop_words)
+nrow(stop_words)
+books_tidy <- books_tokenized %>%
+  anti_join(stop_words)
+head(books_tidy)
+length(unique(books_tidy$word))
+```
+
+## Exercise 4
+
+Create a wordcloud of 100 most frequent words. Hint: Use `wordcloud` package.  
+ 
+```{r exercise-4, results='asis'}
+library(wordcloud2)
+library(htmlwidgets)
+
+word_freq <- books_tidy %>%
+  count(word)
+
+book <- unique(word_freq$book)
+
+for(i in book) {
+  dataset <- word_freq %>% 
+    filter(book == i) %>% 
+    arrange(desc(n)) %>%
+    head(100)
+  
+  wc <- wordcloud2(data.frame(word = dataset$word, freq = dataset$n))
+
+  saveWidget(wc, paste0(i, ".html"), selfcontained = F)
+  output_path <- paste0("Tidy_Text_Mining_Exercises_files/figure-gfm/", i, ".png")
+  webshot::webshot(paste0(i, ".html"), 
+                   output_path,
+                   vwidth = 700, 
+                   vheight = 500, 
+                   delay = 7)
+  cat(paste0("- ", i))
+  cat(paste0('![](', output_path,')"\n'))
+  if (file.exists(paste0(i, ".html"))) file.remove(paste0(i, ".html"))
+  unlink(paste0(i, "_files"), recursive = TRUE, force = TRUE)
+}
+```
+
+## Exercise 5
+
+Find the most frequent words for each book.
+ 
+```{r exercise-5}
+word_freq %>% 
+  group_by(book) %>% 
+  arrange(desc(n)) %>% 
+  filter(row_number() == 1)
+```
+## Exercise 6
+
+Perform TF-IDF transformation of the books. Find the words with the highest TF-IDF score for each book.  
+ 
+```{r exercise-6}
+
+```
+
+
+## Exercise 7
+
+```{r exercise-7}
+
+```
+
+## Exercise 8
+
+```{r exercise-8}
+
+```
+
+## Exercise 9
+
+```{r exercise-9}
+
+```
+
+## Exercise 10
+
+```{r exercise-10}
+
+```
