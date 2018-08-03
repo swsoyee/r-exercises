@@ -21,7 +21,15 @@ Solutions of [R-exercises.com](https://www.r-exercises.com/).
 | 22 May 2017     | [Instrumental Variables in R exercises (Part-2)](https://www.r-exercises.com/2017/05/22/instrumental-variables-in-r-exercises-part-2/) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Instrumental%20Variables%20in%20R%20exercises%20(Part-2).Rmd) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Instrumental_Variables_in_R_exercises__Part-2_.md) |
 | 15 May 2017     | [Instrumental Variables in R exercises (Part-1)](https://www.r-exercises.com/2017/05/15/instrumental-variables-in-r-exercises-part-1/) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Instrumental%20Variables%20in%20R%20exercises%20(Part-1).Rmd) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Instrumental_Variables_in_R_exercises__Part-1_.md) |
 
-### 
+
+
+###3. Dimensionality Reduction
+
+| 🗓️Date         | 📚Source                                                      | 🛠️Code                                                        | 📝Report                                                      |
+| ------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 28 April 2017 | [Data science for Doctors: Variable importance Exercises](https://www.r-exercises.com/2017/04/28/data-science-for-doctors-variable-importance/) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Data%20science%20for%20Doctors%20Variable%20importance%20Exercises.Rmd) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Data_science_for_Doctors_Variable_importance_Exercises.md) |
+
+
 
 
 ## Package exercises
