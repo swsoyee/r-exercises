@@ -1,0 +1,163 @@
+---
+title: 'Data science for Doctors: Variable importance Exercises'
+author: "Vasileios Tsakalos"
+date: "28 April 2017"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](https://www.r-exercises.com/wnw-images/wp-content/uploads/2017/01/Selection_047-320x320.pngmin.png)
+
+Data science enhances people’s decision making. Doctors and researchers are making critical decisions every day. Therefore, it is absolutely necessary for those people to have some basic knowledge of data science. This series aims to help people that are around medical field to enhance their data science skills.  
+
+We will work with a health related database the famous “Pima Indians Diabetes Database”. It was generously donated by Vincent Sigillito from Johns Hopkins University. Please find further information regarding the dataset [here](https://archive.ics.uci.edu/ml/machine-learning-databases/pima-indians-diabetes/pima-indians-diabetes.names).  
+
+This is the tenth part of the series and it aims to cover the very basics of the subject of principal correlation coefficient and components analysis, those two methods illustrate how variables are related.
+In my opinion, it is necessary for researchers to know how to have a notion of the relationships between variables, in order to be able to find potential cause and effect relation – however this relation is hypothetical, you can’t claim that there is a cause-effect relation only because the correlation is high between those two variables-,remove unecessary variables etc. In particular we will go through [Pearson correlation coefficient](https://en.wikipedia.org/wiki/Pearson_correlation_coefficient) and [Confidence interval](https://en.wikipedia.org/wiki/Bootstrapping_(statistics)) by the bootstrap and  [Principal component analysis](https://en.wikipedia.org/wiki/Principal_component_analysis).  
+
+Before proceeding, it might be helpful to look over the help pages for the `ggplot`, `cor`, `cor.tes`, `boot.cor`, `quantile`, `eigen`, `princomp`, `summary`, `plot`, `autoplot`.  
+
+Moreover please load the following libraries.  
+```
+install.packages("ggplot2")
+library(ggplot2)
+install.packages("ggfortify")
+library(ggfortify)
+```
+Please run the code below in order to load the data set and transform it into a proper data frame format:  
+```
+url <- "https://archive.ics.uci.edu/ml/machine-learning-databases/pima-indians-diabetes/pima-indians-diabetes.data"
+data <- read.table(url, fileEncoding="UTF-8", sep=",")
+names <- c('preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class')
+colnames(data) <- names
+data <- data[-which(data$mass == 0),]
+```
+Answers to the exercises are available [here](http://www.r-exercises.com/2017/04/28/data-science-for-doctors-variable-importance-solutions).
+
+If you obtained a different (correct) answer than those listed on the solutions page, please feel free to post your answer as a comment on that page.  
+
+## Exercise 1
+
+Compute the value of the correlation coefficient for the variables `age` and `preg`.
+
+```{r exercise-1, message=FALSE}
+library(ggplot2)
+library(ggfortify)
+url <- "https://gist.githubusercontent.com/chaityacshah/899a95deaf8b1930003ae93944fd17d7/raw/3d35de839da708595a444187e9f13237b51a2cbe/pima-indians-diabetes.csv"
+data <- read.table(url, fileEncoding = "UTF-8", sep = ",", header = TRUE)
+colnames(data)
+names <- c('preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class')
+colnames(data) <- names
+data <- data[- which(data$mass == 0), ]
+head(data)
+
+with(data = data, cor(age, preg))
+```
+
+## Exercise 2
+
+Construct the scatterplot for the variables `age` and `preg`.  
+
+```{r exercise-2, message=FALSE}
+library(viridis)
+ggplot(data = data, aes(x = age, y = preg)) +
+  stat_density2d(geom = "raster", aes(fill = stat(density)), contour = FALSE) +
+  scale_fill_viridis() +
+  coord_cartesian(expand = FALSE) +
+  geom_point(col = 'white', size = .3) +
+  labs(x = "Age (years)", y = "Number of times pregnant", 
+       title = "Age vs. number of times pregnant") +
+  theme_bw()
+```
+
+## Exercise 3
+
+Apply a correlation test for the variables `age` and `preg` with null hypothesis to be the correlation is zero and the alternative to be different from zero.   
+
+> Hint: `cor.test`
+
+```{r exercise-3}
+with(data, cor.test(age, preg))
+```
+
+## Exercise 4
+
+Construct a 95% confidence interval is by the bootstrap. First find the correlation by bootstrap.  
+
+> Hint: `mean`  
+ 
+```{r exercise-4, results='asis'}
+data_mat <- data.frame(data$age, data$preg)
+boot.cor <- rep(0, 1000)
+for(i in 1:1000) {
+  temp_dat <- data_mat[sample(1:nrow(data_mat), replace=TRUE), ]
+  boot.cor[i] <- cor(temp_dat$data.age, temp_dat$data.preg)
+}
+mean(boot.cor)
+```
+
+## Exercise 5
+
+Now that you have found the correlation, find the 95% confidence interval.  
+ 
+```{r exercise-5}
+quantile(boot.cor, c(0.025,0.975))
+```
+
+## Exercise 6
+
+Find the eigen values and eigen vectors for the data set(exclude the `class.fac` variable).  
+ 
+```{r exercise-6}
+eigen(cor(data[, 1:ncol(data) - 1]))
+```
+
+
+## Exercise 7
+
+Compute the principal components for the dataset used above.
+
+```{r exercise-7, warning=FALSE}
+pca <- princomp(data[, 1:ncol(data) - 1], center = TRUE, cor = TRUE, scores = TRUE)
+pca
+```
+
+## Exercise 8
+
+Show the importance of each principal component.    
+
+```{r exercise-8}
+smr <- summary(pca)
+smr
+```
+
+## Exercise 9
+
+Plot the principal components using an elbow graph.  
+
+```{r exercise-9}
+qplot(x = names(smr$sdev), 
+      y = smr$sdev, 
+      xlab = "Components",
+      ylab = "Standard deviation",
+      main = "Elbow Graph of PCA",
+      geom = c("path", "point"), 
+      group = 1) +
+  theme_bw()
+```
+
+## Exercise 10
+
+Constract a scatterplot with x-axis to be the first component and the y-axis to be the second component. Moreover if possible draw the eigen vectors on the plot.
+> Hint: autoplot  
+
+```{r exercise-10}
+autoplot(pca, colour = "age",
+         loadings = TRUE,
+         loadings.label = TRUE,
+         loadings.label.size = 5) +
+  theme_bw()
+```
