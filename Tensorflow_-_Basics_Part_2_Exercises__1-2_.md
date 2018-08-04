@@ -1,0 +1,186 @@
+Tensorflow – Basics Part 2 : Exercises (1/2)
+================
+Vasileios Tsakalos
+7 January 2018
+
+![](https://www.r-exercises.com/wp-content/uploads/2017/11/unnamed.jpg)
+
+Tensorflow is an open source, software library for numerical computation
+using *data flow graphs*. Nodes in the graph are called ops (short for
+operations), while the graph edges represent the R multi-dimensional
+data arrays (tensors) communicated between them. An op takes zero or
+more Tensors, performs some computation, and produces zero or more
+Tensors.
+
+In this set of exercises, we will go through the basics of
+[Tensorflow](https://www.tensorflow.org/). By the end of this post, you
+will have a good understanding on variable tensor types. Before we start
+solving the exercises, it is recommended to check out the
+[tutorial](https://www.r-exercises.com/2017/12/24/tensorflow-basics-part-2)
+that this post is based on.
+
+Before proceeding, it might be helpful to look over the help pages for
+the `tf$Variable`, `tf$ones`, `tf$zeros`,
+`tf$global_variables_initializer`, `tf$variables_initializer`,
+`tf$train$Saver`, `saver$save`, `saver$restore`, `tf$assign`.
+
+Answers to the exercises are available
+[here](https://www.r-exercises.com/2018/01/07/tensorflow-basics-part-2-exercises-1-2-solutions).
+If you obtained a different (correct) answer than those listed on the
+solutions page, please feel free to post your answer as a comment on
+that page.
+
+## Exercise 1
+
+Create a variable `W` of shape 10 x 10, filled with ones and a variable
+`b` of shape 10 X 1, filled with zeros.
+
+``` r
+library(tensorflow)
+W <- tf$Variable(tf$ones(shape = c(10L, 10L)), name = "W")
+b <- tf$Variable(tf$zeros(shape = c(10L, 1L)), name = "b")
+```
+
+## Exercise 2
+
+Initialize all the variables you have created before.
+
+``` r
+init_op <- tf$global_variables_initializer()
+with(tf$Session() %as% sess, {
+  sess$run(init_op)
+})
+```
+
+## Exercise 3
+
+Initialize only the variable `W`.
+
+``` r
+## Method 1
+# init_W <- tf$variables_initializer(c(W), name = "init_W")
+# with(tf$Session() %as% sess, {
+#   sess$run(init_W)
+# })
+
+## Method 2
+with(tf$Session() %as% sess, {
+  sess$run(W$initializer)
+})
+```
+
+## Exercise 4
+
+Create a variable `W_dec` with ten times the value of `W`.
+
+``` r
+W_dec <- tf$Variable(W$initialized_value() * 10.0, name = "W_dec")
+```
+
+## Exercise 5
+
+Print the structure of the variable.
+
+``` r
+with(tf$Session() %as% sess, {
+  sess$run(init_op)
+  print(W)
+})
+```
+
+    ## Variable(shape=(10, 10), dtype=float32_ref)
+    ## 
+    ##  num [1:10, 1:10] 1 1 1 1 1 1 1 1 1 1 ...
+    ## 
+
+## Exercise 6
+
+Print the values of the variable.
+
+``` r
+with(tf$Session() %as% sess, {
+  sess$run(init_op)
+  print(W$eval())
+})
+```
+
+    ##       [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]
+    ##  [1,]    1    1    1    1    1    1    1    1    1     1
+    ##  [2,]    1    1    1    1    1    1    1    1    1     1
+    ##  [3,]    1    1    1    1    1    1    1    1    1     1
+    ##  [4,]    1    1    1    1    1    1    1    1    1     1
+    ##  [5,]    1    1    1    1    1    1    1    1    1     1
+    ##  [6,]    1    1    1    1    1    1    1    1    1     1
+    ##  [7,]    1    1    1    1    1    1    1    1    1     1
+    ##  [8,]    1    1    1    1    1    1    1    1    1     1
+    ##  [9,]    1    1    1    1    1    1    1    1    1     1
+    ## [10,]    1    1    1    1    1    1    1    1    1     1
+
+## Exercise 7
+
+Save the variable `b` to a directory of your choice and name the file as
+`save.ckpt`.
+
+``` r
+saver <- tf$train$Saver(dict(my_b = b))
+with(tf$Session() %as% sess, {
+  sess$run(init_op)
+  save_path <- saver$save(sess, "D:/r-exercises/model.ckpt")
+})
+```
+
+## Exercise 8
+
+Restore the variable you have saved on the previous exercise.
+
+``` r
+with(tf$Session() %as% sess, {
+  # Restore variables from disk
+  saver$restore(sess, "D:/r-exercises/model.ckpt")
+})
+```
+
+## Exercise 9
+
+Create a Variable named “current\_state” that will be initialized to the
+scalar value 0. Then, create a constant named ‘five’ and with the value
+5. After that, create another object named ‘new\_value’ that is the
+addition of ‘current\_state’ and ‘five’ (use `tf$add`). Having done
+that, create a new object that you assign the ‘new\_value’ to
+‘current\_state’.
+
+``` r
+current_state <- tf$Variable(0L, name = "multiples_five")
+five <- tf$constant(5L)
+new_value <- tf$add(current_state, five)
+update <- tf$assign(current_state, new_value)
+init_op <- tf$global_variables_initializer()
+```
+
+## Exercise 10
+
+Initialize the variable. Then, create a for loop with 5 steps where you
+assign the new value to the current state. Anything interesting you have
+noticed?
+
+``` r
+with(tf$Session() %as% sess, {
+  sess$run(init_op)
+  
+  # Print the initial value of 'current_state'
+  print(sess$run(current_state))
+  
+  # Run the op that updates 'current_state' and print 'current_state'.
+  for (i in 1:5) {
+    sess$run(update)
+    print(sess$run(current_state))
+  }
+})
+```
+
+    ## [1] 0
+    ## [1] 5
+    ## [1] 10
+    ## [1] 15
+    ## [1] 20
+    ## [1] 25
