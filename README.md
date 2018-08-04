@@ -72,6 +72,7 @@ Solutions of [R-exercises.com](https://www.r-exercises.com/).
 
 | 🗓️Date            | 📚Source                                                      | 🛠️Code                                                        | 📝Report                                                      |
 | ---------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 7 January 2018   | [Tensorflow – Basics Part 2 : Exercises (1/2)](https://www.r-exercises.com/2018/01/07/tensorflow-basics-part-2-exercises-1-2/) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Tensorflow%20-%20Basics%20Part%202%20Exercises%20(1-2).Rmd) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Tensorflow_-_Basics_Part_2_Exercises__1-2_.md) |
 | 10 December 2017 | [Tensorflow – Basics Part 1: Exercises](https://www.r-exercises.com/2017/12/10/tensorflow-basics-part-1-exercises/) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Tensorflow%20%E2%80%93%20Basics%20Part%201%20Exercises.Rmd) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Tidy_Text_Mining_Exercises.md) |
 
 
