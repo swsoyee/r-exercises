@@ -6,9 +6,10 @@ Solutions of [R-exercises.com](https://www.r-exercises.com/).
 ## Machine Learning exercises
 ### 1. Clustering
 
-| 🗓️Date         | 📚Source                                                      | 🛠️Code                                                        | 📝Report                                                      |
-| :------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+|         🗓️Date | 📚Source                                                      | 🛠️Code                                                        | 📝Report                                                      |
+| ------------: | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | 13 April 2018 | [K-Means Clustering in R – Exercises](https://www.r-exercises.com/2018/04/13/11256/) | [Link](https://github.com/swsoyee/r-exercises/blob/master/K-Means%20Clustering%20in%20R%20%E2%80%93%20Exercises.Rmd) | [Link](https://github.com/swsoyee/r-exercises/blob/master/K-Means_Clustering_in_R_%E2%80%93_Exercises.md) |
+|  10 June 2017 | [Density-Based Clustering Exercises](https://www.r-exercises.com/2017/06/10/density-based-clustering-exercises/) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Density-Based%20Clustering%20Exercises.Rmd) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Density-Based_Clustering_Exercises.md) |
 
 
 
