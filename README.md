@@ -31,6 +31,14 @@ Solutions of [R-exercises.com](https://www.r-exercises.com/).
 
 
 
+### 4. Statistics
+
+| 🗓️Date        | 📚Source                                                      | 🛠️Code                                                        | 📝Report                                                      |
+| ------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 8 April 2017 | [Correlation and Correlogram Exercises](https://www.r-exercises.com/2017/04/08/correlation-and-correlogram-exercises/) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Correlation%20and%20Correlogram%20Exercises.Rmd) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Correlation_and_Correlogram_Exercises.md) |
+
+
+
 
 ## Package exercises
 ### 1. `base`
