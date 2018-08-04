@@ -68,7 +68,15 @@ Solutions of [R-exercises.com](https://www.r-exercises.com/).
 
 
 
-### 3. `plotly`
+### 3. `Tensorflow`
+
+| 🗓️Date            | 📚Source                                                      | 🛠️Code                                                        | 📝Report                                                      |
+| ---------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 10 December 2017 | [Tensorflow – Basics Part 1: Exercises](https://www.r-exercises.com/2017/12/10/tensorflow-basics-part-1-exercises/) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Tensorflow%20%E2%80%93%20Basics%20Part%201%20Exercises.Rmd) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Tidy_Text_Mining_Exercises.md) |
+
+
+
+### 4. `plotly`
 
 | 🗓️Date           | 📚Source                                                      | 🛠️Code                                                        | 📝Report                                                      |
 | :-------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -78,7 +86,7 @@ Solutions of [R-exercises.com](https://www.r-exercises.com/).
 
 
 
-### 4. `ggplot`
+### 5. `ggplot`
 
 | 🗓️Date            | 📚Source                                                      | 🛠️Code                                                        | 📝Report                                                      |
 | :--------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
