@@ -79,50 +79,63 @@ head(dep_time)
 
 ## Exercise 6
 
-Change the class of dep_time from character to times.  
+Change the class of `dep_time` from character to times.  
  
 ```{r exercise-6}
-
+dep_time <- chron(times. = dep_time)
+head(dep_time)
 ```
 
 
 ## Exercise 7
 
-Print whether the first column has missing values (NAs). Try to answer this question with two ways. 
-> Hint: %in%  
+Print the first 10 rows and then the 10 last rows of the `dep_time`. If the formatting of the object is 'HH:MM:SS'(as it should) then assign the `dep_time` to `flights$DepTime`.  
 
 ```{r exercise-7, warning=FALSE}
-# Method 1
-sum(is.na(flights[, 1]))
-# Method 2
-TRUE %in% is.na(flights[, 1])
+head(dep_time, n = 10)
+tail(dep_time, n = 10)
+flights$DepTime <- dep_time
 ```
 
 ## Exercise 8
 
-Print the number of variables that contain missing values.  
+Do the exact same process for the `flights$ArrTime` and create the variable `arr_time`.  
 
 ```{r exercise-8}
-na.cal <- sapply(flights, function(x) sum(is.na(x)))
-na.cal
-sum(na.cal > 0)
+format.time <- function(x) {
+  # Padding
+  x <- str_pad(x, width = 4, side = "left", pad = 0)
+  # Spliting
+  x <- paste(substr(x, 1, 2), substr(x, 3, 4), "00", sep = ":")
+  # Converting
+  x <- chron(times. = x)
+  # Return
+  return(x)
+}
+arr_time <- format.time(flights$ArrTime)
+head(arr_time)
+tail(arr_time)
+flights$ArrTime <- arr_time
 ```
 
 ## Exercise 9
 
-Find the portion of the variables that contain missing values. What do you think about it?  
+Do the exact same process for the `flights$CRSDepTime` and create the variable `crs_dep_time`.  
 
 ```{r exercise-9}
-na.portion <- sprintf("%.2f %%", round(na.cal / nrow(flights) * 100, 2))
-names(na.portion) <- names(na.cal)
-na.portion
-sum(na.cal > 0) / ncol(flights)
+crs_dep_time <- format.time(flights$CRSDepTime)
+head(crs_dep_time)
+tail(crs_dep_time)
+flights$CRSDepTime <- crs_dep_time
 ```
 
 ## Exercise 10
 
-Print the names of the variables that contain missing values.  
+Do the exact same process for the `flights$CRSArrTime` and create the variable `crs_arr_time`.   
 
 ```{r exercise-10, message=FALSE}
-names(na.cal[na.cal > 0])
+crs_arr_time <- format.time(flights$CRSArrTime)
+head(crs_arr_time)
+tail(crs_arr_time)
+flights$CRSArrTime <- crs_arr_time
 ```
