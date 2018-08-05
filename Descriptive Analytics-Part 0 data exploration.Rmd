@@ -1,0 +1,123 @@
+---
+title: 'Descriptive Analytics-Part 0: data exploration'
+author: "Vasileios Tsakalos"
+date: "19 October 2016"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](https://www.r-exercises.com/wnw-images/wp-content/uploads/2016/10/download.jpgmin.jpg)
+
+Descriptive Analytics is the examination of data or content, usually manually performed, to answer the question “What happened?”.  
+
+This is the first set of exercise of a series of exercises that aims to provide a descriptive analytics solution to the ‘2008’ data set from [here](http://stat-computing.org/dataexpo/2009/the-data.html). Download it and save it as a csv file. This data set which contains the arrival and departure information for all domestic flights in the US from 2008 has become the “iris” data set for Big Data. In the exercises below we cover the basics of data exploration. I chose it to be the ‘part 0’ of the descriptive analytics solution, because in order to proceed to the data pre-processing and then description you need to get to know your data set while it is not formally on the value chain of descriptive analytics process. Before proceeding, it might be helpful to look over the help pages for the `str`, `summary`, `dim`, `nrow`, `ncol`, `names`, `is.na`, `match` functions.    
+
+Answers to the exercises are available [here](http://www.r-exercises.com/2016/10/19/descriptive-analytics-part-0-data-exploration-solution/).  
+
+If you obtained a different (correct) answer than those listed on the solutions page, please feel free to post your answer as a comment on that page.  
+
+Load the data before proceeding. Let’s name the dataset as `flights`
+```
+flights <- read.csv('2008.csv')  
+```
+## Exercise 1
+
+Print the structure of the data. What do you think about it?  
+
+```{r exercise-1, message=FALSE}
+library(data.table)
+library(R.utils)
+if(!file.exists("D://2008.csv")){
+  bunzip2("D://2008.csv.bz2", "D://2008.csv", remove = F)
+}
+flights <- fread("D://2008.csv")
+str(flights)
+```
+> Function `fread` can't not read `csv.bz2` directly. it will cause *mmap'd region has EOF at the end* error.
+
+## Exercise 2
+
+Print the `summary` statistics of the data. What do you think about the values? (format, consistency, completeness)  
+
+```{r exercise-2, message=FALSE}
+summary(flights)
+```
+
+> Too many NA's values.  
+
+## Exercise 3
+
+Print the dimensionality of the data (number of rows and columns)  
+
+```{r exercise-3}
+dim(flights)
+```
+
+## Exercise 4
+
+Print the number of rows. This may seem like a silly command, but it is quite useful for loops and if statements.  
+ 
+```{r exercise-4}
+nrow(flights)
+```
+
+## Exercise 5
+
+Print the number of columns.
+ 
+```{r exercise-5, message=FALSE}
+ncol(flights)
+```
+
+## Exercise 6
+
+Print the names of the variables.  
+ 
+```{r exercise-6}
+names(flights)
+```
+
+
+## Exercise 7
+
+Print whether the first column has missing values (NAs). Try to answer this question with two ways. 
+> Hint: %in%  
+
+```{r exercise-7, warning=FALSE}
+# Method 1
+sum(is.na(flights[, 1]))
+# Method 2
+TRUE %in% is.na(flights[, 1])
+```
+
+## Exercise 8
+
+Print the number of variables that contain missing values.  
+
+```{r exercise-8}
+na.cal <- sapply(flights, function(x) sum(is.na(x)))
+na.cal
+sum(na.cal > 0)
+```
+
+## Exercise 9
+
+Find the portion of the variables that contain missing values. What do you think about it?  
+
+```{r exercise-9}
+na.portion <- sprintf("%.2f %%", round(na.cal / nrow(flights) * 100, 2))
+names(na.portion) <- names(na.cal)
+na.portion
+sum(na.cal > 0) / ncol(flights)
+```
+
+## Exercise 10
+
+Print the names of the variables that contain missing values.  
+
+```{r exercise-10, message=FALSE}
+names(na.cal[na.cal > 0])
+```

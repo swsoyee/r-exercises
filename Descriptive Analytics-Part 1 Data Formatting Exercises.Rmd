@@ -1,0 +1,128 @@
+---
+title: 'Descriptive Analytics-Part 1: Data Formatting Exercises'
+author: "Vasileios Tsakalos"
+date: "26 October 2016"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](https://www.r-exercises.com/wnw-images/wp-content/uploads/2016/10/download.jpgmin.jpg)
+
+Descriptive Analytics is the examination of data or content, usually manually performed, to answer the question “What happened?”.  
+
+This is the first set of exercise of a series of exercises that aims to provide a descriptive analytics solution to the ‘2008’ data set from [here](http://stat-computing.org/dataexpo/2009/the-data.html). Download it and save it as a csv file. This data set which contains the arrival and departure information for all domestic flights in the US from 2008 has become the “iris” data set for Big Data. In the exercises below we will try to make the format of the dates adequate for further processing. Before proceeding, it might be helpful to look over the help pages for the `str_pad`, `substring`, `paste`, `chron`, `head`.  
+
+For this set of exercises you will need to install and load the packages `stringr`, `chron`.
+```
+install.packages('stringr')
+install.packages('chron')
+library(stringr)
+library(chron)
+```
+Answers to the exercises are available [here](http://www.r-exercises.com/2016/10/26/descriptive-analytics-part-1-data-formatting-solutions/).  
+
+
+## Exercise 1
+
+Print the first five rows of the dataset. What do you think about the date formatting?  
+
+```{r exercise-1, message=FALSE}
+library(data.table)
+library(R.utils)
+library(stringr)
+library(chron)
+if(!file.exists("D://2008.csv")){
+  bunzip2("D://2008.csv.bz2", "D://2008.csv", remove = F)
+}
+flights <- fread("D://2008.csv")
+head(flights, n = 5)
+```
+
+## Exercise 2
+
+Create a new objected named `dep_time` and assign the values of `flights$DepTime` . If the value is less than 4 elements, fill make it a 4-element value with zeros. For example, 123 -> 0123.  
+
+```{r exercise-2, message=FALSE}
+dep_time <- str_pad(flights$DepTime, width = 4, side = "left", pad = 0)
+head(dep_time)
+```
+
+## Exercise 3
+
+Create a new object named `hour` and assign the first two elements of the `dep_time` object. Can you figure out why I am asking that?  
+
+```{r exercise-3}
+hour <- substr(dep_time, 1, 2)
+head(hour)
+```
+
+## Exercise 4
+
+Create a new object named `minutes` and assign the last two elements of the `dep_time` object.  
+ 
+```{r exercise-4}
+minutes <- substr(dep_time, 3, 4)
+head(minutes)
+```
+
+## Exercise 5
+
+Assign to the object `dep_time` the hour in format ‘HH:MM:SS’ , seconds should be ‘00’ , we make this assumption for the sake of formatting.
+ 
+```{r exercise-5, message=FALSE}
+dep_time <- paste(substr(dep_time, 1, 2), substr(dep_time, 3, 4), "00", sep = ":")
+head(dep_time)
+```
+
+## Exercise 6
+
+Change the class of dep_time from character to times.  
+ 
+```{r exercise-6}
+
+```
+
+
+## Exercise 7
+
+Print whether the first column has missing values (NAs). Try to answer this question with two ways. 
+> Hint: %in%  
+
+```{r exercise-7, warning=FALSE}
+# Method 1
+sum(is.na(flights[, 1]))
+# Method 2
+TRUE %in% is.na(flights[, 1])
+```
+
+## Exercise 8
+
+Print the number of variables that contain missing values.  
+
+```{r exercise-8}
+na.cal <- sapply(flights, function(x) sum(is.na(x)))
+na.cal
+sum(na.cal > 0)
+```
+
+## Exercise 9
+
+Find the portion of the variables that contain missing values. What do you think about it?  
+
+```{r exercise-9}
+na.portion <- sprintf("%.2f %%", round(na.cal / nrow(flights) * 100, 2))
+names(na.portion) <- names(na.cal)
+na.portion
+sum(na.cal > 0) / ncol(flights)
+```
+
+## Exercise 10
+
+Print the names of the variables that contain missing values.  
+
+```{r exercise-10, message=FALSE}
+names(na.cal[na.cal > 0])
+```
