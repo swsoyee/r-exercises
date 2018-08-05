@@ -1,0 +1,157 @@
+---
+title: 'Descriptive Analytics-Part 2: Data Imputation'
+author: "Vasileios Tsakalos"
+date: "2 November 2016"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](https://www.r-exercises.com/wnw-images/wp-content/uploads/2016/10/download.jpgmin.jpg)
+
+Descriptive Analytics is the examination of data or content, usually manually performed, to answer the question “What happened?”.  
+
+In order to be able to solve this set of exercises you should have solved the [part 0](http://www.r-exercises.com/2016/10/19/descriptive-analytics-part-0-data-exploration/) and’[part 1](http://www.r-exercises.com/2016/10/26/descriptive-analytics-part-1-data-formatting/) of this series, in case you haven’t you can find the solutions to run them in your machine [part 0](http://www.r-exercises.com/2016/10/19/descriptive-analytics-part-0-data-exploration-solution/) and [part 1](http://www.r-exercises.com/2016/10/26/descriptive-analytics-part-1-data-formatting-solutions/). This is the third set of exercise of a series of exercises that aims to provide a descriptive analytics solution to the ‘2008’ data set from [here](http://stat-computing.org/dataexpo/2009/the-data.html). This data set which contains the arrival and departure information for all domestic flights in the US from 2008 has become the “iris” data set for Big Data. In the exercises below we will try to impute the missing values in order to be able to analyse the data later on. Before proceeding, it might be helpful to look over the help pages for the `mean`, `median`, `transform`, `impute`, `lm`, `predict`.  
+
+For this set of exercises you will need to install and load the package `Hmisc`.  
+```
+install.packages('Hmisc')
+library(Hmisc)
+```
+Answers to the exercises are available [here](http://www.r-exercises.com/2016/11/02/descriptive-analytics-part-2-data-imputation-solutions/).  
+
+If you obtained a different (correct) answer than those listed on the solutions page, please feel free to post your answer as a comment on that page.  
+
+## Exercise 1
+
+Print the `summary` statistics in order to have an actual idea of the missing values.  
+
+```{r exercise-1, message=FALSE}
+library(data.table)
+library(R.utils)
+library(stringr)
+library(Hmisc)
+library(chron)
+if(!file.exists("D://2008.csv")){
+  bunzip2("D://2008.csv.bz2", "D://2008.csv", remove = F)
+}
+flights <- fread("D://2008.csv")
+head(flights, n = 5)
+format.time <- function(x) {
+  # Padding
+  x <- str_pad(x, width = 4, side = "left", pad = 0)
+  # Spliting
+  x <- paste(substr(x, 1, 2), substr(x, 3, 4), "00", sep = ":")
+  # Converting
+  x <- chron(times. = x)
+  # Return
+  return(x)
+}
+summary(flights)
+```
+
+## Exercise 2
+
+Impute the missing values of `flights$ArrTime` with the mean using `which`.  
+
+```{r exercise-2, message=FALSE}
+flights$ArrTime <- format.time(flights$ArrTime)
+# Check the missing values in `flights$ArrTime`
+sum(is.na(flights$ArrTime))
+head(flights[is.na(flights$ArrTime), ]$ArrTime)
+flights$ArrTime <- impute(flights$ArrTime, mean)
+# Check again
+sum(is.na(flights$ArrTime))
+```
+
+## Exercise 3
+
+Impute the missing values of `flights$CRSArrTime` with the `median` using `which`.  
+
+```{r exercise-3}
+flights$CRSArrTime <- format.time(flights$CRSArrTime)
+# Check the missing values in `flights$CRSArrTime`
+sum(is.na(flights$CRSArrTime))
+head(flights[is.na(flights$CRSArrTime), ]$CRSArrTime)
+# Can not use impute directly, so calculate median value first.
+t.median <- median(flights$CRSArrTime, na.rm = TRUE)
+flights$CRSArrTime <- impute(flights$CRSArrTime, t.median)
+# Check again
+sum(is.na(flights$CRSArrTime))
+```
+
+## Exercise 4
+
+Impute the missing values of `flights$AirTime` with the `median` using the `transform` operator.  
+ 
+```{r exercise-4}
+flights$AirTime <- format.time(flights$AirTime)
+at.median <- median(flights$AirTime, na.rm = TRUE)
+
+# flights <- transform(flights, AirTime = ifelse(is.na(AirTime), at.mean, AirTime))
+# Error: cannot allocate vector of size 53.5 Mb
+
+flights$AirTime <- impute(flights$AirTime, at.median)
+```
+
+## Exercise 5
+
+Impute the missing values of `flights$DepTime` with the `median` using the `transform` operator.  
+
+> Note: mind the data formatting .  
+ 
+```{r exercise-5}
+flights$DepTime <- format.time(flights$DepTime)
+dt.median <- median(flights$DepTime, na.rm = TRUE)
+flights$DepTime <- impute(flights$DepTime, dt.median)
+```
+
+## Exercise 6
+
+Impute the missing values of `flights$ArrDelay` with the median using the `impute` operator.  
+ 
+```{r exercise-6, message=FALSE}
+flights$ArrDelay <- format.time(flights$ArrDelay)
+ad.median <- median(flights$AirTime, na.rm = TRUE)
+flights$AirTime <- impute(flights$AirTime, ad.median)
+```
+
+## Exercise 7
+
+Impute the missing values of `flights$CRSElapsedTime` with the `median` using the `impute` operator.  
+
+```{r exercise-7, warning=FALSE}
+flights$CRSElapsedTime <- format.time(flights$CRSElapsedTime)
+ct.median <- median(flights$CRSElapsedTime, na.rm = TRUE)
+flights$CRSElapsedTime <- impute(flights$CRSElapsedTime, ct.median)
+```
+
+## Exercise 8
+
+Make a linear regression model named `lm_dep_time_delay` with target variable `flights$DepDelay` and independent variables : `flights$ArrTime`, `flights$AirTime`, `flights$ArrDelay`, `flights$DepTime`.  
+
+```{r exercise-8}
+lm_dep_time_delay <- lm(data = flights, formula = DepDelay ~ ArrTime + AirTime + ArrDelay + DepTime)
+summary(lm_dep_time_delay)
+```
+
+## Exercise 9
+
+Create an object `pred_dep_time_delay` and assign the predicted values.    
+
+```{r exercise-9}
+pred_dep_time_delay <- predict(lm_dep_time_delay, flights)
+```
+
+## Exercise 10
+
+Impute the missing values based using the `pred_dep_time_delay` and `ifelse` function.
+Print the `summary` statistics to see the changes that you made.
+
+```{r exercise-10, message=FALSE}
+flights$DepDelay <- ifelse(is.na(flights$DepDelay), pred_dep_time_delay, flights$DepDelay)
+
+summary(flights)
+```
