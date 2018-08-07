@@ -1,0 +1,203 @@
+---
+title: 'Well-Behaved Functions – Exercises'
+author: "sindri"
+date: "27 April 2018"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](https://www.r-exercises.com/wnw-images/wp-content/uploads/2018/04/robots-functions-600x403.jpgmin.jpg)
+
+It is said that, in R, everything that happens is a function call. So, if we want to improve our ability to make things happen the way we want them to, maybe it’s worth getting very comfortable with how functions work in R.  　
+In this exercise set, we’ll try to gain better fluency and deepen our understanding of the R logic by (mostly) writing some functions.  
+Solutions are available [here](https://www.r-exercises.com/2018/04/27/well-behaved-functions-solutions).  
+
+## Exercise 1
+
+Write a function that calculates number `a` to the power of `b`, but let `b` have a default value of 2.  
+
+```{r exercise-1, message=FALSE}
+ex1.power <- function(a, b = 2) {
+  return(a ^ b)
+}
+
+ex1.power(4)
+ex1.power(2, 3)
+```
+
+## Exercise 2
+
+Re-write the function from exercise 1 so that `a` has a default value of `b+1` already from the formals (from the argument definition.)  
+
+```{r exercise-2, message=FALSE}
+ex2.power <- function(a = b + 1, b = 2) {
+  return(a ^ b)
+}
+ex2.power()
+```
+
+## Exercise 3
+
+Write a function `div()` that checks if the first number [divides](https://math.stackexchange.com/a/452150/103861) the second.  
+
+```{r exercise-3}
+div <- function(first, second) {
+  ifelse(second %% first == 0, TRUE, FALSE)
+}
+div(2, 3)
+div(3, 2)
+div(2, 2)
+```
+
+## Exercise 4
+
+Write an `infix` function `%div%` that checks if the left-hand side divides the right-hand side.  
+```
+# Example
+3 %div% 42
+[1] TRUE
+3 %div% 13
+[1] FALSE
+```
+ 
+```{r exercise-4}
+`%div%` <- function(first, second) {
+  ifelse(second %% first == 0, TRUE, FALSE)
+}
+3 %div% 42
+3 %div% 13
+```
+
+## Exercise 5
+
+Write a function that changes the value of `pi` in the R global environment to whatever you specify as the argument. 
+
+> Note: it is not recommended to re-define the value of “pi” in a real-life R program.
+
+```
+# Example
+pi
+[1] 3.141593
+chpi(4)
+pi
+[1] 4
+chpi("I like cats")
+pi
+[1] "I like cats"
+```
+
+```{r exercise-5}
+chpi <- function(p) {
+  pi <<- p
+  print(pi)
+}
+pi <- pi
+pi
+chpi(4)
+chpi("I like cats")
+```
+
+## Exercise 6
+
+Write an infix (binary) function that checks if the left hand side (lhs) is in the range between the maximum and minimum of the rhs.  
+```
+set.seed(1)
+rnorm(6) %betw% c(-1, 1)
+[1] TRUE TRUE TRUE FALSE TRUE TRUE
+```
+ 
+```{r exercise-6, message=FALSE}
+`%betw%` <- function(lhs, rhs){
+  return(lhs > min(rhs) & lhs < max(rhs))
+}
+set.seed(1)
+rnorm(6) %betw% c(-1:1)
+```
+
+## Exercise 7
+
+Write another infix operator that pastes two strings and uses it in a function that takes `ellipsis`. Now, call the function and feed it two strings and concatenate them to produce some text.  
+
+```{r exercise-7, warning=FALSE}
+`%+%` <- function(str1, str2) {
+  paste(str1, str2)
+}
+
+news <- function(...) {
+  strings <- list(...)
+  stopifnot(length(strings) == 2)
+  "It is" %+% 
+    strings[[1]] %+%
+    "to practice" %+%
+    strings[[2]]
+}
+
+news("ok", "writing functions in R")
+```
+
+## Exercise 8
+
+What did you think about the example in exercise 3? What does the following code (from the [book Advanced R](http://adv-r.had.co.nz/)) return?  
+```
+f2 <- function(x = z) {
+  z <- 100
+  x
+}
+f2()
+```
+
+```{r exercise-8}
+f2 <- function(x = z) {
+  z <- 100
+  x
+}
+f2()
+```
+
+## Exercise 9
+
+Write a function that creates a function analogous to the one from exercise 1 by feeding 2 as an argument.  
+
+> Note: this is not a typo.  
+
+```
+# Example of a function called power()
+powerof2 <- power(2)
+powerof2(3)
+[1] 9
+```
+
+```{r exercise-9}
+power <- function(p) {
+  function(a, b = p) {
+    a^b
+  }
+}
+
+powerof2 <- power(2)
+powerof2(3)
+```
+
+## Exercise 10
+
+Make a new `names<-` (replacement) function called `names2<-` that also allows you to update the names of data structures, except it forces the names it is given to all-lowercase.
+```
+# Example
+x <- 3:4
+names2(x) <- c("IMPORTANT", "For The CAT do NOT EAT")
+x
+important for the cat do not eat
+3 4
+```
+```{r exercise-10}
+`names2<-` <- function(x, value) {
+  attr(x, "names") <- tolower(value)
+  x
+}
+
+names2(iris) <- names(iris)
+head(iris)
+```
