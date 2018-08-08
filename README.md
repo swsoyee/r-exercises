@@ -105,5 +105,3 @@ Solutions of [R-exercises.com](https://www.r-exercises.com/).
 | 15 October 2017  | [Visual Data Exploration Exercises](https://www.r-exercises.com/2017/10/15/visual-data-exploration-exercises/) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Visual%20Data%20Exploration%20Exercises.Rmd) | [Link](https://github.com/swsoyee/r-exercises/blob/master/Visual_Data_Exploration_Exercises.md) |
 
 
-
-。
