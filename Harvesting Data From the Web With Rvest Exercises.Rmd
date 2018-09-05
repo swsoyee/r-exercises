@@ -1,0 +1,104 @@
+---
+title: 'Harvesting Data From the Web With Rvest: Exercises'
+author: "Yanir Mor"
+date: "20 August 2018"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](https://www.r-exercises.com/wp-content/uploads/2018/08/wheat-863392_1280.jpg)
+
+The rvest package allows for simple and convenient extraction of data from the web into R, which is often called “web scraping.” Web scraping is a basic and important skill that every data analyst should master. You’ll often see it as a job requirement.  
+
+In the following exercises, you will practice your scraping skills on the “Money” section of the CNN website. All of the main functions of the rvest package will be used. Answers to these exercises are available [here](https://r-exercises.com/2018/08/20/harvesting-data-from-the-web-with-rvest-solutions/).  
+
+Since websites are constantly changing, some of the solutions might grow to be outdated with time. If this is the case, you are welcome to inform the author and the relevant sections will be updated.  
+
+## Exercise 1
+
+Read the HTML content of the following URL with a variable called `webpage`:  
+https://money.cnn.com/data/us_markets/  
+At this point, it will also be useful to open this web page in your browser.  
+
+```{r exercise-1, message=FALSE}
+library(rvest)
+webpage <- read_html("https://money.cnn.com/data/us_markets/")
+```
+
+## Exercise 2
+
+Get the session details (`status`, `type`, `size`) of the above mentioned URL.  
+
+```{r exercise-2, message=FALSE}
+html_session("https://money.cnn.com/data/us_markets/")
+```
+
+## Exercise 3
+
+Extract all of the sector names from the “Stock Sectors” table (bottom left of the web page.)  
+
+```{r exercise-3}
+html_nodes(webpage, "a[href*='sectors']") %>% html_text()
+```
+
+## Exercise 4
+
+Extract all of the “3 Month % Change” values from the “Stock Sectors” table.  
+ 
+```{r exercise-4}
+html_nodes(webpage, "span.posChangePct") %>% html_text()
+```
+
+## Exercise 5
+
+Extract the table “What’s Moving” (top middle of the web page) into a data-frame.  
+
+```{r exercise-5}
+html_nodes(webpage, "div table")[[1]] %>% html_table()
+```
+
+## Exercise 6
+
+Re-construct all of the links from the first column of the “What’s Moving” table.  
+Hint: the base URL is “https://money.cnn.com”
+ 
+```{r exercise-6, message=FALSE}
+paste0("https://money.cnn.com", html_nodes(webpage, "td a.wsod_symbol") %>% html_attr("href"))
+```
+
+## Exercise 7
+
+Extract the titles under the “Latest News” section (bottom middle of the web page.)  
+
+```{r exercise-7, warning=FALSE}
+html_nodes(webpage, "div.HeadlineList li") %>% html_text()
+```
+
+## Exercise 8
+
+To understand the structure of the data in a web page, it is often useful to know what the underlying attributes are of the text you see.  
+Extract the attributes (and their values) of the HTML element that holds the timestamp underneath the “What’s Moving” table.  
+
+```{r exercise-8}
+webpage %>% html_nodes(".wsod_disclaimer span") %>% html_attrs() %>% .[[1]]
+```
+
+## Exercise 9
+
+Extract the values of the blue percentage-bars from the “Trending Tickers” table (bottom right of the web page.)  
+Hint: in this case, the values are stored under the “class” attribute.  
+
+```{r exercise-9}
+webpage %>% html_nodes("div.bars") %>% html_attr("class")
+```
+
+## Exercise 10
+
+Get the links of all of the “svg” images on the web page.  
+
+```{r exercise-10}
+webpage %>% html_nodes("img[src$='svg']") %>% html_attr("src")
+```
