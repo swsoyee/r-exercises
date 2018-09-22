@@ -1,0 +1,110 @@
+---
+title: 'R Markdown exercises part 1'
+author: "Euthymios Kasvikis"
+date: "29 July 2017"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](https://www.r-exercises.com/wnw-images/wp-content/uploads/2017/07/document-428335__340-320x320.jpgmin.jpg)
+
+## INTRODUCTION  
+
+R Markdown is one of the most popular data science tools and is used to save and execute code, create exceptional reports whice are easily shareable.  
+
+The documents that R Markdown provides are fully reproducible and support a wide variety of static and dynamic output formats.  
+
+Using markdown syntax, which provides an easy way of creating documents that can be converted to many other file types, while embeding R code in the report, so it is not necessary to keep the report and R script separately. Furthermore The report is written as normal text, so knowledge of HTML is not required. Of course no additional files are needed because everything is incorporated in the HTML file.  
+
+Before proceeding, please follow our short [tutorial](http://r-exercises.com/2017/07/21/how-to-create-reports-with-r-markdown-in-rstudio/).  
+
+Look at the examples given and try to understand the logic behind them. Then try to solve the exercises below using R and without looking at the answers. Then check the [solutions](http://r-exercises.com/2017/07/29/r-markdown-exercises-solutions/).
+to check your answers.  
+
+## Exercise 1
+
+Create a new R Markdown file (.Rmd) in RStudio.
+
+```{r exercise-1, message=FALSE, echo=FALSE}
+"File -> New File -> R Markdown..."
+```
+
+## Exercise 2
+
+Insert a YAML Header with title, author and date of your choice at the top of your `.Rmd` script.  
+
+```
+---
+title: 'R Markdown exercises part 1'
+author: "Euthymios Kasvikis"
+date: "29 July 2017"
+output: rmarkdown::github_document
+---
+```
+
+## Exercise 3
+
+Display the summary of “cars” dataset in your report. **HINT**: Use `summary()`.   
+
+```{r exercise-3}
+summary(cars)
+```
+
+## Exercise 4
+
+Make a plot of the “cars” dataset under the summary you just created. **HINT**: Use `plot()`.  
+ 
+```{r exercise-4}
+plot(cars)
+```
+
+## Exercise 5
+
+Create a small experimental dataframe and dipslay it in your report. **HINT**: Use `data.frame()`.  
+
+```{r exercise-5}
+head(data.frame(cars))
+```
+
+## Exercise 6
+
+Hide the code from your report. **HINT**: Use `echo`.  
+ 
+```{r exercise-6, message=FALSE, echo=FALSE}
+
+```
+
+## Exercise 7
+
+Load the package `knitr` in your `.Rmd` file. and hide the code chunk. **HINT**: Use `echo`.  
+
+```{r exercise-7, warning=FALSE, echo=FALSE}
+library(knitr)
+```
+
+## Exercise 8
+
+Hide the warning message that appeared in your report. **HINT**: Use `warning`.  
+
+```{r exercise-8, warning=FALSE}
+"warning=FALSE"
+```
+
+## Exercise 9
+
+Set `fig.width` and `fig.height` of your plot to 5.  
+
+```{r exercise-9, fig.width=5, fig.height=5}
+plot(cars)
+```
+
+## Exercise 10
+
+Change the file format of your plot from `.png` to `.svg`. **HINT**: Use `dev`.  
+
+```{r exercise-10, dev='svg'}
+plot(cars)
+```
