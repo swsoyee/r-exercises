@@ -1,0 +1,157 @@
+R Markdown exercises part 2
+================
+Euthymios Kasvikis
+4 August 2017
+
+![](https://www.r-exercises.com/wnw-images/wp-content/uploads/2017/07/document-428335__340-320x320.jpgmin.jpg)
+
+## INTRODUCTION
+
+R Markdown is one of the most popular data science tools and is used to
+save and execute code, create exceptional reports whice are easily
+shareable.
+
+The documents that R Markdown provides are fully reproducible and
+support a wide variety of static and dynamic output formats.
+
+Using markdown syntax, which provides an easy way of creating documents
+that can be converted to many other file types, while embeding R code in
+the report, so it is not necessary to keep the report and R script
+separately. Furthermore The report is written as normal text, so
+knowledge of HTML is not required. Of course no additional files are
+needed because everything is incorporated in the HTML file.
+
+Before proceeding, please follow our short
+[tutorial](http://r-exercises.com/2017/07/21/how-to-create-reports-with-r-markdown-in-rstudio/).
+
+Look at the examples given and try to understand the logic behind them.
+Then try to solve the exercises below using R and without looking at the
+answers. Then check the
+[solutions](http://r-exercises.com/2017/08/04/r-markdown-exercises-part-2-solutions/).
+to check your answers.
+
+## Exercise 1
+
+Make a table out of the object dataframe you created and set its numbers
+to have one significant figure. **HINT**: Use `kable()`.
+
+``` r
+library(knitr)
+kable(head(cars))
+```
+
+| speed | dist |
+| ----: | ---: |
+|     4 |    2 |
+|     4 |   10 |
+|     7 |    4 |
+|     7 |   22 |
+|     8 |   16 |
+|     9 |   10 |
+
+``` r
+plot(cars)
+```
+
+![](R_Markdown_exercises_part_2_files/figure-gfm/exercise-1-1.png)<!-- -->
+
+## Exercise 2
+
+Use bold text for your report’s title. HINT: Use \*\* \*\*.
+
+    **R Markdown exercises part 2**
+
+## Exercise 3
+
+Use Italic text for the author’s name. HINT: Use \* \*.
+
+    *Euthymios Kasvikis*
+
+## Exercise 4
+
+Add “Summary” as Header of size 1 above your summary context.
+
+    # Summary
+
+## Exercise 5
+
+Add “Plot”, “Dataframe” and “Table 1” as Headers of size 3 above the
+rest of the three objects of your report respectively.
+
+    ### Plot
+    ### Dataframe
+    ### Table 1
+
+## Exercise 6
+
+Create manually a small table for your dataframe.
+
+``` r
+kable(head(cars))
+```
+
+| speed | dist |
+| ----: | ---: |
+|     4 |    2 |
+|     4 |   10 |
+|     7 |    4 |
+|     7 |   22 |
+|     8 |   16 |
+|     9 |   10 |
+
+## Exercise 7
+
+Apply right alignment to the column “B”.
+
+``` r
+kable(head(cars), digits = 1)
+```
+
+| speed | dist |
+| ----: | ---: |
+|     4 |    2 |
+|     4 |   10 |
+|     7 |    4 |
+|     7 |   22 |
+|     8 |   16 |
+|     9 |   10 |
+
+## Exercise 8
+
+Create an unordered list of the contents of column “A” of your
+dataframe.
+
+``` r
+cat(paste0('* ', head(cars)$speed, '\n', collapse = ''))
+```
+
+  - 4
+  - 4
+  - 7
+  - 7
+  - 8
+  - 9
+
+## Exercise 9
+
+Transform the list you just created to ordered.
+
+``` r
+speed <- sort(head(cars)$speed)
+for (i in 1:length(speed)) {
+  cat(paste0(i, '. ', speed[i], '\n', collapse = ''))
+}
+```
+
+1.  4
+2.  4
+3.  7
+4.  7
+5.  8
+6.  9
+
+## Exercise 10
+
+Add a link named “Link” that leads to “www.r-exercises.com”.
+
+    [Link](www.r-exercises.com)
